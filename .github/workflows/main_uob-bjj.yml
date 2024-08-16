@@ -49,7 +49,8 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+    permissions:
+      id-token: write #This is required for requesting the JWT
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -58,8 +59,13 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_1988E867452641A2AF2EA801455FECE9 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_5DEC60E5E7554D8FBEAE606F9490280F }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A78C8ACACD27453584B385D1B8424729 }}
 
-      
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
@@ -67,3 +73,4 @@ jobs:
           app-name: 'UoB-BJJ'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_98F453D3AB8849C7A3F2A6651098F3E3 }}
+
