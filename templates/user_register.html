@@ -1,0 +1,37 @@
+<!-- templates/user_login.html -->
+{% extends "base.html" %}
+
+{% block title %}Log in · UoB BJJ{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-6 col-lg-4">
+      <form action='login' method='POST'>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" name='email' id='email' required>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name='password' required>
+        </div>
+        <div class="mb-3">
+          <label for="first_name" class="form-label">First name</label>
+          <input type="text" class="form-control" id="first_name" name='first_name' id='first_name' required>
+        </div>
+        <div class="mb-3">
+          <label for="last_name" class="form-label">Last name</label>
+          <input type="text" class="form-control" id="last_name" name='last_name' id='last_name' required>
+        </div>
+        <div class="mb-3">
+          <label for="medical_info" class="form-label">Medical information</label>
+          <input type="text" class="form-control" id="medical_info" name='medical_info' id='medical_info'>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Submit</button>
+      </form>
+    </div>  
+  </div>
+</div>
+{{ error }}
+{% endblock %}

@@ -17,9 +17,13 @@
           </a>
         </div>
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          {% if user.is_authenticated and user.user_role == 'committee' %}
+          <li><a href="/new-event" class="nav-link px-2 active">Create event</a></li>
+          <li><a href="/committee-dashboard" class="nav-link px-2 active">Committee Dashboard</a></li>
+          {% endif %}
           <li><a href="/" class="nav-link px-2 active">Class sign up</a></li>
           <li><a href="/club-info" class="nav-link px-2">Club info</a></li>
-          {% if is_authenticated %}
+          {% if user.is_authenticated %}
           <li><a class="nav-link px-2 text-black">Signed in: {{ user.first_name }} {{ user.last_name }}</a></li>
           <a href="/logout" class="text-left text-decoration-none nav-link text-danger bg-white rounded px-2">Logout <i class="bi bi-door-closed-fill mx-auto"></i></a>
           {% else %}

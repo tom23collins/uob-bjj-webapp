@@ -29,3 +29,9 @@ def db_query(app, sql):
     cursor = connection.cursor()
     cursor.execute(sql)
     return cursor.fetchall()
+
+def db_query_values(app, sql, values):
+    connection = connection_open(app)
+    cursor = connection.cursor()
+    cursor.execute(sql, values)
+    return cursor.fetchall()

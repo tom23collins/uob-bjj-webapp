@@ -1,0 +1,23 @@
+<!-- templates/commitee/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Sign Up · UoB BJJ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for row in sign_ups %}
+            <tr>
+                <th>{{ row[1] }} has signed up</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+</div>
+{% endblock %}

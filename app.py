@@ -1,16 +1,12 @@
-from flask import Flask, redirect, render_template, url_for, request
+from flask import Flask, redirect, render_template, url_for, request, abort
 import flask
 import flask_login
-from db import db_query, db_update
+from db import db_query, db_update, db_query_values
 import config
 import os
 from datetime import datetime
-
-# Backend to do:
-# Hash passwords
-# Check if user is signed up for event (user feedback)
-# Create new events
-# Dashboard for users with commitee role
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -35,10 +31,24 @@ login_manager = flask_login.LoginManager()
 
 login_manager.init_app(app)
 
+def role_required(role):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not flask_login.current_user.is_authenticated:
+                flash("You need to be logged in to access this page.")
+                return redirect(url_for('login'))
+            if flask_login.current_user.user_role != role:
+                flash("You don't have the required role to access this page.")
+                return redirect(url_for('index'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
 @login_manager.user_loader
 def user_loader(email):
     if email not in users:
-        return
+        return None
 
     user = User()
     user.id = email
@@ -50,11 +60,60 @@ def user_loader(email):
 
 @app.route('/')
 def index():
+    sessions = db_query(app, 'SELECT * FROM event_table')
+    
+    if flask_login.current_user.is_authenticated:
+        registrations = db_query_values(app, 'SELECT * FROM sign_up_log WHERE email = %s;', (flask_login.current_user.id,))
+
+        updated_sessions = []
+
+        for session in sessions:
+            registered = any(str(session[0]) == registration[2] for registration in registrations)
+            updated_sessions.append(session + (registered,))
+
+        sessions = updated_sessions
+    else:
+        sessions = [row + (False,) for row in sessions]
+
     return render_template('index.html', 
-                           event_data=db_query(app, 'SELECT * FROM event_table'),
-                           is_authenticated=flask_login.current_user.is_authenticated,
+                           event_data=sessions,
                            user=flask_login.current_user
                            )
+
+@app.route('/committee-dashboard')
+@role_required('committee')
+def committee_dashboard():
+    sessions = db_query(app, 'SELECT * FROM event_table')
+    today = datetime.today().date()
+    default_event = min(sessions, key=lambda event: (event[2] - today).days if (event[2] - today).days >= 0 else float('inf'))
+    registrations = db_query_values(app, 'SELECT * FROM sign_up_log WHERE event_id = %s;', (default_event[0],))
+
+    return render_template('/committee/dashboard.html', 
+                           sign_ups=registrations,
+                           user=flask_login.current_user
+                           )
+
+@app.route('/new-event', methods=['GET', 'POST'])
+@role_required('committee')
+def create_new_event():
+    if flask.request.method == 'GET':
+        return render_template('/committee/create_new_event.html',
+                                user=flask_login.current_user)
+    sql = """
+    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    """
+    values = (flask.request.form['event_name'],
+              flask.request.form['date'],
+              flask.request.form.get('start_time'),
+              flask.request.form.get('end_time'),
+              flask.request.form.get('category'),
+              flask.request.form.get('capacity'),
+              flask.request.form.get('location'))
+    db_update(app, sql, values)
+
+    return render_template('/committee/create_new_event.html',
+                            user=flask_login.current_user)
 
 @app.route('/class-sign-up', methods=['GET'])
 @flask_login.login_required
@@ -73,47 +132,36 @@ def class_sign_up():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if flask.request.method == 'GET':
-        return '''
-               <form action='register' method='POST'>
-                <input type='text' name='email' id='email' placeholder='email'/>
-                <input type='password' name='password' id='password' placeholder='password'/>
-                <input type='text' name='first_name' id='first_name' placeholder='first name'/>
-                <input type='text' name='last_name' id='last_name' placeholder='last name'/>
-                <input type='text' name='medical_info' id='medical_info' placeholder='medical info'/>
-                <input type='submit' name='submit'/>
-               </form>
-               '''
+        return render_template('user_register.html')
     sql = """
     INSERT INTO user_table (`email`, `password`, `first_name`, `last_name`, `medical_info`) 
     VALUES (%s, %s, %s, %s, %s)
     """
     values = (flask.request.form['email'],
-              flask.request.form['password'],
+              generate_password_hash(flask.request.form['password']),
               flask.request.form['first_name'],
               flask.request.form['last_name'],
               flask.request.form['medical_info'])
     db_update(app, sql, values)
+
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if flask.request.method == 'GET':
-        return '''
-               <form action='login' method='POST'>
-                <input type='text' name='email' id='email' placeholder='email'/>
-                <input type='password' name='password' id='password' placeholder='password'/>
-                <input type='submit' name='submit'/>
-               </form>
-               '''
+        return render_template('user_login.html')
 
     email = flask.request.form['email']
-    if email in users and flask.request.form['password'] == users[email]['password']:
+    password = flask.request.form['password']
+
+    if email in users and check_password_hash(users[email]['password'], password):
         user = User()
         user.id = email
         flask_login.login_user(user)
         return redirect(url_for('index'))
 
-    return redirect(url_for('login'))
+    error = "Invalid email or password"
+    return render_template('user_login.html', error=error)
 
 @app.route('/logout')
 def logout():
