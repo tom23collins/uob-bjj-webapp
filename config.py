@@ -1,12 +1,9 @@
 import os
+# Secret key
+SECRET_KEY = os.getenv('SECRET_KEY')
 
-class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'your_secret_key')
-    
-    # MySQL connection string
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://{os.environ.get('DB_USERNAME')}:{os.environ.get('DB_PASSWORD')}"
-        f"@{os.environ.get('DB_HOST')}/{os.environ.get('DB_NAME')}"
-    )
-    
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+# Database configuration
+DB_HOST = os.getenv('DB_HOST')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_KEY')
+DB_NAME = os.getenv('DB_NAME')

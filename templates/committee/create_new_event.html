@@ -1,0 +1,50 @@
+<!-- templates/committee_create_new_event.html -->
+{% extends "base.html" %}
+
+{% block title %}Log in · UoB BJJ{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-6 col-lg-4">
+      <form action='new-event' method='POST'>
+        <div class="mb-3">
+          <label for="event_name" class="form-label">Event name</label>
+          <input type="text" class="form-control" id="event_name" name='event_name' required>
+        </div>
+        <div class="mb-3">
+          <label for="date" class="form-label">Date</label>
+          <input type="date" class="form-control" id="date" name='date' required>
+        </div>
+        <div class="mb-3">
+          <label for="start_time" class="form-label">Start time</label>
+          <input type="time" class="form-control" id="start_time" name='start_time'>
+        </div>
+        <div class="mb-3">
+          <label for="end_time" class="form-label">End time</label>
+          <input type="time" class="form-control" id="end_time" name='end_time'>
+        </div>
+        <div class="mb-3">
+          <label for="category" class="form-label">Type</label>
+          <select class="form-select" aria-label="Default select example" id='category' name="category" required>
+            <option selected disabled>Event type</option>
+            <option value="Nogi">Nogi Class</option>
+            <option value="Gi">Gi Class</option>
+            <option value="Social">Social</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="capacity" class="form-label">Capacity</label>
+          <input type="number" class="form-control" id="capacity" name='capacity' required>
+        </div>
+        <div class="mb-3">
+          <label for="location" class="form-label">Location</label>
+          <input type="text" class="form-control" id="location" name='location'>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Submit</button>
+      </form>
+    </div>  
+  </div>
+</div>
+{{ error }}
+{% endblock %}

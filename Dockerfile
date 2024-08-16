@@ -24,7 +24,7 @@ ENV DB_HOST=your_azure_mysql_host
 ENV DB_NAME=your_database_name
 
 # The rest of the Dockerfile remains the same
-
+ENV FLASK_ENV=production
 
 # Run the application
-CMD ["flask", "run"]
+CMD if [ "$FLASK_ENV" = "development" ]; then flask run --host=0.0.0.0 --port=5000; else gunicorn --bind 0.0.0.0:5000 wsgi:app; fi
