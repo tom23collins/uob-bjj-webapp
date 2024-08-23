@@ -1,5 +1,4 @@
-from flask import Flask, redirect, render_template, url_for, request, abort
-import flask
+from flask import Flask, redirect, render_template, url_for, request, flash
 import flask_login
 from db import db_query, db_update, db_query_values
 import config
@@ -13,15 +12,6 @@ app = Flask(__name__)
 app.config.from_object(config)
 app.secret_key = app.config.get('SECRET_KEY')
 
-users = db_query(app, 'SELECT * FROM user_table')
-users = email_dict = {item[0]: {'password': item[1], 
-                                'first_name': item[2], 
-                                'last_name': item[3],
-                                'medical_info': item[4],
-                                'user_role': item[5]
-                                } for item in users}
-user = ''
-
 if os.getenv('FLASK_ENV') == 'development':
     app.config['DEBUG'] = True
 
@@ -29,7 +19,6 @@ class User(flask_login.UserMixin):
     pass
 
 login_manager = flask_login.LoginManager()
-
 login_manager.init_app(app)
 
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -51,15 +40,17 @@ def role_required(role):
 
 @login_manager.user_loader
 def user_loader(email):
-    if email not in users:
+    user_data = db_query_values(app, 'SELECT * FROM user_table WHERE email = %s', (email,))
+    if not user_data:
         return None
 
     user = User()
-    user.id = email
-    user.first_name = users[email]['first_name']
-    user.last_name = users[email]['last_name']
-    user.medical_info = users[email]['medical_info']
-    user.user_role = users[email]['user_role']
+    user.id = user_data[0][0]
+    user.password = user_data[0][1]
+    user.first_name = user_data[0][2]
+    user.last_name = user_data[0][3]
+    user.medical_info = user_data[0][4]
+    user.user_role = user_data[0][5]
     return user
 
 @app.route('/')
@@ -81,15 +72,15 @@ def index():
             'start_time': session[3],
             'end_time': session[4],
             'category': session[5],
-            'capactiy': session[6],
+            'capacity': session[6],
             'location': session[7],
             'registered': int(session[0]) in registration_event_ids if flask_login.current_user.is_authenticated else False
         }
         updated_sessions.append(event)
 
     return render_template('index.html', 
-                        event_data=updated_sessions,
-                        user=flask_login.current_user)
+                           event_data=updated_sessions,
+                           user=flask_login.current_user)
 
 @app.route('/committee-dashboard')
 @role_required('committee')
@@ -157,30 +148,33 @@ def committee_dashboard():
     return render_template('/committee/dashboard.html',
                            combined_data=combined_data,
                            event_data=event_data,  # Pass event data for the dropdown
-                           user=flask_login.current_user
-                           )
+                           user=flask_login.current_user)
 
 @app.route('/new-event', methods=['GET', 'POST'])
 @role_required('committee')
 def create_new_event():
-    if flask.request.method == 'GET':
+    if request.method == 'GET':
         return render_template('/committee/create_new_event.html',
-                                user=flask_login.current_user)
+                               user=flask_login.current_user)
+    
     sql = """
-    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`) 
+    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`)
     VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
-    values = (flask.request.form['event_name'],
-              flask.request.form['date'],
-              flask.request.form.get('start_time'),
-              flask.request.form.get('end_time'),
-              flask.request.form.get('category'),
-              flask.request.form.get('capacity'),
-              flask.request.form.get('location'))
+    values = (
+        request.form['event_name'],
+        request.form['date'],
+        request.form.get('start_time'),
+        request.form.get('end_time'),
+        request.form.get('category'),
+        request.form.get('capacity'),
+        request.form.get('location')
+    )
     db_update(app, sql, values)
 
     return render_template('/committee/create_new_event.html',
-                            user=flask_login.current_user)
+                           user=flask_login.current_user)
+
 
 @app.route('/class-sign-up', methods=['GET'])
 @flask_login.login_required
@@ -191,39 +185,42 @@ def class_sign_up():
         VALUES (%s, %s, %s)
         """
         values = (flask_login.current_user.id,
-                request.args.get('event_id'),
-                datetime.now())
+                  request.args.get('event_id'),
+                  datetime.now())
         db_update(app, sql, values)
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if flask.request.method == 'GET':
+    if request.method == 'GET':
         return render_template('user_register.html')
+
     sql = """
-    INSERT INTO user_table (`email`, `password`, `first_name`, `last_name`, `medical_info`) 
+    INSERT INTO user_table (`email`, `password`, `first_name`, `last_name`, `medical_info`)
     VALUES (%s, %s, %s, %s, %s)
     """
-    values = (flask.request.form['email'],
-              generate_password_hash(flask.request.form['password']),
-              flask.request.form['first_name'],
-              flask.request.form['last_name'],
-              flask.request.form['medical_info'])
+    values = (
+        request.form['email'],
+        generate_password_hash(request.form['password']),
+        request.form['first_name'],
+        request.form['last_name'],
+        request.form['medical_info']
+    )
     db_update(app, sql, values)
 
     return redirect(url_for('login'))
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if flask.request.method == 'GET':
+    if request.method == 'GET':
         return render_template('user_login.html')
 
-    email = flask.request.form['email']
-    password = flask.request.form['password']
+    email = request.form['email']
+    password = request.form['password']
 
-    if email in users and check_password_hash(users[email]['password'], password):
-        user = User()
-        user.id = email
+    user = user_loader(email)
+    if user and check_password_hash(user.password, password):
         flask_login.login_user(user)
         return redirect(url_for('index'))
 
