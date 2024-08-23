@@ -1,0 +1,112 @@
+/* Fonts */
+@font-face {
+    font-family: 'Larken';
+    src: url('/static/fonts/Larken-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Larken';
+    src: url('/static/fonts/Larken-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: url('/static/fonts/Manrope-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: url('/static/fonts/Manrope-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+
+/* Override Bootstrap's fonts */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Larken', serif;
+    font-weight: 700; /* Bold by default for headers */
+}
+
+/* Body: Manrope Regular and Bold */
+body {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 400; /* Regular by default for body text */
+}
+
+p, span, li, a, div, button {
+    font-family: 'Manrope', sans-serif;
+}
+
+/* Specific styles for bold text in the body */
+strong, b {
+    font-weight: 700; /* Bold */
+}
+
+/* Custom colours */
+/* Custom prominent colors */
+body,
+.nav-bg {
+    background-color: #181818;
+    color: #FAFAFA;
+}
+
+/* Custom accent color for primary elements */
+.btn-primary,
+.text-primary,
+.registered_event {
+    background-color: #C59A00;
+    border-color: #C59A00;
+    color: #FAFAFA; /* Ensure text is readable on the accent color */
+}
+
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:focus-visible {
+    background-color: rgba(197, 154, 0, 0.6) !important;
+    border-color: rgba(197, 154, 0, 0.6) !important;
+}
+
+.btn-success:disabled {
+    background-color: #181818;
+    border-color: #181818;
+    color: #FAFAFA; /* Ensure text is readable on the accent color */
+}
+
+.btn-success:hover,
+.btn-success:active,
+.btn-success:focus-visible {
+    background-color: #181818;
+    border-color: #181818;
+    color: #C59A00; /* Ensure text is readable on the accent color */
+}
+
+a,
+.nav-link {
+    color: #C59A00;
+}
+
+a:hover,
+.nav-link:hover {
+    color: #FAFAFA;
+}
+
+a.no-hover:hover {
+    color: #C59A00;
+}
+
+/* Custom card styling */
+.card {
+    background-color: #FAFAFA;
+    border-color: #C59A00;
+}
+
+.card-title {
+    color: #181818;
+}
