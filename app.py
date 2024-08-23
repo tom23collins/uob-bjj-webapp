@@ -7,6 +7,7 @@ import os
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+from scripts import format_date
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -30,6 +31,9 @@ class User(flask_login.UserMixin):
 login_manager = flask_login.LoginManager()
 
 login_manager.init_app(app)
+
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 def role_required(role):
     def decorator(f):
@@ -60,36 +64,99 @@ def user_loader(email):
 
 @app.route('/')
 def index():
-    sessions = db_query(app, 'SELECT * FROM event_table')
-    
+    session_data = db_query(app, 'SELECT * FROM event_table')
+    updated_sessions = []
+    registrations = []
+
     if flask_login.current_user.is_authenticated:
         registrations = db_query_values(app, 'SELECT * FROM sign_up_log WHERE email = %s;', (flask_login.current_user.id,))
 
-        updated_sessions = []
+    registration_event_ids = {int(registration[2]) for registration in registrations}
 
-        for session in sessions:
-            registered = any(str(session[0]) == registration[2] for registration in registrations)
-            updated_sessions.append(session + (registered,))
-
-        sessions = updated_sessions
-    else:
-        sessions = [row + (False,) for row in sessions]
+    for session in session_data:
+        event = {
+            'event_id': session[0],
+            'event_name': session[1],
+            'date': format_date(session[2]),
+            'start_time': session[3],
+            'end_time': session[4],
+            'category': session[5],
+            'capactiy': session[6],
+            'location': session[7],
+            'registered': int(session[0]) in registration_event_ids if flask_login.current_user.is_authenticated else False
+        }
+        updated_sessions.append(event)
 
     return render_template('index.html', 
-                           event_data=sessions,
-                           user=flask_login.current_user
-                           )
+                        event_data=updated_sessions,
+                        user=flask_login.current_user)
 
 @app.route('/committee-dashboard')
 @role_required('committee')
 def committee_dashboard():
-    sessions = db_query(app, 'SELECT * FROM event_table')
-    today = datetime.today().date()
-    default_event = min(sessions, key=lambda event: (event[2] - today).days if (event[2] - today).days >= 0 else float('inf'))
-    registrations = db_query_values(app, 'SELECT * FROM sign_up_log WHERE event_id = %s;', (default_event[0],))
+    event_data = []
+    user_data = []
+    sign_up_data = []
 
-    return render_template('/committee/dashboard.html', 
-                           sign_ups=registrations,
+    # Fetch event data
+    for events in db_query(app, 'SELECT * FROM event_table'):
+        event = {
+            'event_id': events[0],
+            'event_name': events[1],
+            'date': events[2],
+            'start_time': events[3],
+            'end_time': events[4],
+            'category': events[5],
+            'capacity': events[6],
+            'location': events[7]
+        }
+        event_data.append(event)
+
+    # Fetch user data
+    for users in db_query(app, 'SELECT * FROM user_table'):
+        user = {
+            'email': users[0],
+            'first_name': users[2],
+            'last_name': users[3],
+            'medical_info': users[4]
+        }
+        user_data.append(user)
+
+    # Fetch sign-up data
+    for sign_ups in db_query(app, 'SELECT * FROM sign_up_log'):
+        sign_up = {
+            'email': sign_ups[1],
+            'event_id': int(sign_ups[2]),  # Convert event_id to integer
+            'time_stamp': sign_ups[3]
+        }
+        sign_up_data.append(sign_up)
+
+    # Get the selected event ID from the dropdown
+    selected_event_id = request.args.get('event_filter')
+
+    # Filter combined data by the selected event, if any
+    combined_data = []
+    for sign_up in sign_up_data:
+        # Find the corresponding event
+        event = next((e for e in event_data if e['event_id'] == sign_up['event_id']), None)
+        # Find the corresponding user
+        user = next((u for u in user_data if u['email'] == sign_up['email']), None)
+
+        if event and user:
+            if not selected_event_id or str(event['event_id']) == selected_event_id:
+                combined_data.append({
+                    'event_name': event['event_name'],
+                    'event_date': event['date'],
+                    'event_time': f"{event['start_time']} - {event['end_time']}",
+                    'user_name': f"{user['first_name']} {user['last_name']}",
+                    'user_email': user['email'],
+                    'medical_info': user['medical_info'],
+                    'sign_up_time': sign_up['time_stamp']
+                })
+
+    return render_template('/committee/dashboard.html',
+                           combined_data=combined_data,
+                           event_data=event_data,  # Pass event data for the dropdown
                            user=flask_login.current_user
                            )
 
