@@ -28,8 +28,19 @@
           {% endif %}
           <li><a href="/" class="nav-link px-2 active">Class sign up</a></li>
           {% if user.is_authenticated %}
-          <li><a class="nav-link px-2 no-hover">Signed in: {{ user.first_name }} {{ user.last_name }}</a></li>
-          <a href="/logout" class="text-left text-decoration-none nav-link rounded px-2">Logout <i class="bi bi-door-closed-fill mx-auto"></i></a>
+          <li class="dropdown">
+            <button class="nav-link px-2 btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ user.first_name }} {{ user.last_name }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end py-0">
+                <li class="py-0">
+                    <a href="/logout" class="dropdown-item d-flex justify-content-between align-items-center py-0">
+                      Sign out
+                      <span class="ms-auto"><i class="bi bi-box-arrow-right"></i></span>
+                    </a>
+                </li>
+            </ul>
+          </li>
           {% else %}
           <li><a href="/login" class="nav-link px-2">Login</a></li>
           {% endif %}
