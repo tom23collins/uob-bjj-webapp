@@ -66,6 +66,10 @@ body,
     color: #FAFAFA; /* Ensure text is readable on the accent color */
 }
 
+.text-white {
+    color: #FAFAFA;
+}
+
 .btn-primary:hover,
 .btn-primary:active,
 .btn-primary:focus-visible {

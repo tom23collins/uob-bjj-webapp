@@ -65,6 +65,7 @@ def index():
     registration_event_ids = {int(registration[2]) for registration in registrations}
 
     for session in session_data:
+        print(session[8])
         event = {
             'event_id': session[0],
             'event_name': session[1],
@@ -74,6 +75,7 @@ def index():
             'category': session[5],
             'capacity': session[6],
             'location': session[7],
+            'location_link': session[8],
             'registered': int(session[0]) in registration_event_ids if flask_login.current_user.is_authenticated else False
         }
         updated_sessions.append(event)
@@ -158,8 +160,8 @@ def create_new_event():
                                user=flask_login.current_user)
     
     sql = """
-    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`)
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`, `location_link`)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     """
     values = (
         request.form['event_name'],
@@ -168,7 +170,8 @@ def create_new_event():
         request.form.get('end_time'),
         request.form.get('category'),
         request.form.get('capacity'),
-        request.form.get('location')
+        request.form.get('location'),
+        request.form.get('location_link')
     )
     db_update(app, sql, values)
 
