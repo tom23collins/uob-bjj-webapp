@@ -62,8 +62,17 @@ body,
 .text-primary,
 .registered_event {
     background-color: #C59A00;
-    border-color: #C59A00;
+    border-color: #C59A00 !important;
     color: #FAFAFA; /* Ensure text is readable on the accent color */
+}
+
+.event {
+    background-color: #181818;
+    border-color: #181818;
+}
+
+.text-white {
+    color: #FAFAFA;
 }
 
 .btn-primary:hover,
@@ -110,4 +119,19 @@ a.no-hover:hover {
 
 .card-title {
     color: #181818;
+}
+
+/* Images for background */
+.login-bg {
+    background-image: url(/static/images/login_bg.jpg);
+    background-size: cover;
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+.register_bg {
+    background-image: url(/static/images/register_bg.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
