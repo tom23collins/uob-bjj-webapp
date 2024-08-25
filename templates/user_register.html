@@ -13,12 +13,12 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
     <link rel="manifest" href="/static/favicon/site.webmanifest">
   </head>
-  <body class="d-flex align-items-center justify-content-center vh-100" style="margin: 0;">
+  <body class="d-flex align-items-center justify-content-center vh-100 register_bg" style="margin: 0;">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-12 col-md-6 col-lg-4 text-center">
           <a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" height="150px" width="150px">
+            <img src="{{ url_for('static', filename='logo.png') }}" height="150px" width="150px" class="rounded">
           </a>
           <form action='register' method='POST'>
             <div class="mb-3 text-start">
