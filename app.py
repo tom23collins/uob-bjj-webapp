@@ -65,7 +65,6 @@ def index():
     registration_event_ids = {int(registration[2]) for registration in registrations}
 
     for session in session_data:
-        print(session[8])
         event = {
             'event_id': session[0],
             'event_name': session[1],
@@ -177,7 +176,6 @@ def create_new_event():
 
     return render_template('/committee/create_new_event.html',
                            user=flask_login.current_user)
-
 
 @app.route('/class-sign-up', methods=['GET'])
 @flask_login.login_required
