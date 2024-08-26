@@ -7,6 +7,7 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from scripts import format_date
+import requests
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -37,6 +38,15 @@ def role_required(role):
             return f(*args, **kwargs)
         return decorated_function
     return decorator
+
+def verify_recaptcha(response):
+    payload = {
+        'secret': app.config.get('CAPTCHA_SECRET_KEY'),
+        'response': response
+    }
+    r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=payload)
+    result = r.json()
+    return result.get('success'), result
 
 @login_manager.user_loader
 def user_loader(email):
@@ -194,8 +204,18 @@ def class_sign_up():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        return render_template('user_register.html')
+        return render_template('user_register.html', site_key=app.config.get('CAPTCHA_SITE_KEY'))
 
+    # Extract the reCAPTCHA token from the form submission
+    recaptcha_response = request.form.get('g-recaptcha-response')
+
+    # Verify the reCAPTCHA response
+    success, recaptcha_result = verify_recaptcha(recaptcha_response)
+    if not success or recaptcha_result.get('score', 0) < 0.5:  # Adjust the score threshold as needed
+        error = "reCAPTCHA verification failed. Please try again."
+        return render_template('user_register.html', error=error, site_key=app.config.get('CAPTCHA_SITE_KEY'))
+
+    # Prepare SQL query to insert new user
     sql = """
     INSERT INTO user_table (`email`, `password`, `first_name`, `last_name`, `medical_info`)
     VALUES (%s, %s, %s, %s, %s)
@@ -207,26 +227,40 @@ def register():
         request.form['last_name'],
         request.form['medical_info']
     )
+
+    # Execute the database update function
     db_update(app, sql, values)
 
+    # Redirect to the login page after successful registration
     return redirect(url_for('login'))
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template('user_login.html')
+        return render_template('user_login.html', site_key=app.config.get('CAPTCHA_SITE_KEY'))
 
+    # Extract the reCAPTCHA token from the form submission
+    recaptcha_response = request.form.get('g-recaptcha-response')
+
+    # Verify the reCAPTCHA response
+    success, recaptcha_result = verify_recaptcha(recaptcha_response)
+    if not success or recaptcha_result.get('score', 0) < 0.5:  # Adjust the score threshold as needed
+        error = "reCAPTCHA verification failed. Please try again."
+        return render_template('user_login.html', error=error, site_key=app.config.get('CAPTCHA_SITE_KEY'))
+
+    # Extract email and password from the form submission
     email = request.form['email']
     password = request.form['password']
 
+    # Load the user using the email
     user = user_loader(email)
     if user and check_password_hash(user.password, password):
         flask_login.login_user(user)
         return redirect(url_for('index'))
 
+    # If login fails, return an error
     error = "Invalid email or password"
-    return render_template('user_login.html', error=error)
+    return render_template('user_login.html', error=error, site_key=app.config.get('CAPTCHA_SITE_KEY'))
 
 @app.route('/logout')
 def logout():
