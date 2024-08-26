@@ -65,8 +65,8 @@ def user_loader(email):
 
 @app.route('/')
 def index():
-    # Get all events from the event_table
-    session_data = db_query(app, 'SELECT * FROM event_table')
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    session_data = db_query_values(app, 'SELECT * FROM event_table WHERE date >= %s', (current_date,))
     updated_sessions = []
     registrations = []
 
@@ -76,7 +76,6 @@ def index():
     registration_event_ids = {int(registration[2]) for registration in registrations}
 
     for session in session_data:
-        # Query to count how many times the event_id appears in sign_up_log
         registration_count = db_query_values(app, 'SELECT COUNT(*) FROM sign_up_log WHERE event_id = %s', (session[0],))
 
         event = {
