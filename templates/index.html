@@ -39,7 +39,11 @@
           {{ row['capacity'] }} Spaces available
         </div>
         <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
-        <button type="submit" class="btn btn-warning">Sign up</button>
+        {% if row['capacity'] == 0 %}
+          <button type="button" class="btn btn-warning" disabled>Fully booked</button>
+        {% else %}
+          <button type="submit" class="btn btn-warning">Sign up</button>
+        {% endif %}
       </div>
     </div>
     </form>

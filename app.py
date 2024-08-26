@@ -65,6 +65,7 @@ def user_loader(email):
 
 @app.route('/')
 def index():
+    # Get all events from the event_table
     session_data = db_query(app, 'SELECT * FROM event_table')
     updated_sessions = []
     registrations = []
@@ -75,6 +76,9 @@ def index():
     registration_event_ids = {int(registration[2]) for registration in registrations}
 
     for session in session_data:
+        # Query to count how many times the event_id appears in sign_up_log
+        registration_count = db_query_values(app, 'SELECT COUNT(*) FROM sign_up_log WHERE event_id = %s', (session[0],))
+
         event = {
             'event_id': session[0],
             'event_name': session[1],
@@ -82,10 +86,11 @@ def index():
             'start_time': session[3],
             'end_time': session[4],
             'category': session[5],
-            'capacity': session[6],
+            'capacity': session[6] - registration_count[0][0],
             'location': session[7],
             'location_link': session[8],
-            'registered': int(session[0]) in registration_event_ids if flask_login.current_user.is_authenticated else False
+            'registered': int(session[0]) in registration_event_ids if flask_login.current_user.is_authenticated else False,
+            'registration_count': registration_count
         }
         updated_sessions.append(event)
 
