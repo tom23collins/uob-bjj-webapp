@@ -1,0 +1,55 @@
+<!-- templates/committee/edit_event.html -->
+{% extends "base.html" %}
+
+{% block title %}Edit Event · UoB BJJ{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-6 col-lg-4 mx-auto mt-1">
+        <form action='/edit-event' method='POST'>
+            <div class="mb-3">
+                <label for="event_name" class="form-label">Event name</label>
+                <input type="text" class="form-control" id="event_name" name='event_name' value="{{ data['event_name'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" name='date' value="{{ data['date'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="start_time" class="form-label">Start time</label>
+                <input type="time" class="form-control" id="start_time" name='start_time' value="{{ data['start_time'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="end_time" class="form-label">End time</label>
+                <input type="time" class="form-control" id="end_time" name='end_time' value="{{ data['end_time'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Type</label>
+                <select class="form-select" id='category' name="category" required>
+                    <option selected disabled>Select event type</option>
+                    <option value="Nogi" {% if data['category'] == 'Nogi' %}selected{% endif %}>Nogi Class</option>
+                    <option value="Gi" {% if data['category'] == 'Gi' %}selected{% endif %}>Gi Class</option>
+                    <option value="Social" {% if data['category'] == 'Social' %}selected{% endif %}>Social</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="capacity" class="form-label">Capacity</label>
+                <input type="number" class="form-control" id="capacity" name='capacity' value="{{ data['capacity'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="location" class="form-label">Location Name</label>
+                <input type="text" class="form-control" id="location" name='location' value="{{ data['location'] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="location_link" class="form-label">Location link from Google Maps</label>
+                <input type="text" class="form-control" id="location_link" name='location_link' value="{{ data['location_link'] }}" required>
+            </div>
+            <input type="hidden" name="event_id" id="event_id" value="{{ data['event_id'] }}">
+            <button type="submit" class="btn btn-primary w-100">Update information</button>
+        </form>
+    </div>  
+  </div>
+</div>
+{{ error }}
+{% endblock %}

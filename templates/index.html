@@ -14,7 +14,7 @@
         <h5>{{ row['date'] }}</h5>
         <hr class="m-0">
         <div class="col-5">
-          <i class="bi bi-clock-fill"></i> {{ row['start_time'] }} - {{ row['end_time'] }}<br>
+          <i class="bi bi-clock-fill"></i> {{ row['start_time'] }}-{{ row['end_time'] }}<br>
         </div>
         <div class="col-7">
           <i class="bi bi-people-fill"></i> {{ row['capacity'] }} Spaces available
@@ -24,6 +24,31 @@
         </div>
         <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
         <button type="submit" class="btn btn-success" disabled>Signed up</button>
+        {% if row['booked_gi']%}
+        <form action="{{  url_for('book_taster_gi') }}" method="GET" class="m-0 p-0"></form>
+          <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+          <button type="submit" class="btn btn-success mt-1 w-100" disabled>You have reserved a Gi</button>
+        </form>
+        {% else %}
+        <form action="{{  url_for('book_taster_gi') }}" method="GET" class="m-0 p-0">
+          <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+          {% if row['gis_booked'] >= 5 %}
+          <button type="submit" class="btn btn-success mt-1 w-100" disabled>Taster Gi's fully booked</button>
+          {% else %}
+          <button type="submit" class="btn btn-success mt-1 w-100" {% if row['category'] != 'Gi' %}disabled{% endif %}>Reserve Taster Gi</button>
+          {% endif %}
+        </form>
+        {% endif %}
+        {% if user.user_role == 'committee' or user.user_role == 'administrator' %}
+        <form action="{{  url_for('view_sign_ups') }}" method="GET" class="m-0 p-0">
+          <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+          <button type="submit" class="btn btn-success mt-1 w-100">View sign ups</button>
+        </form>
+        <form action="{{  url_for('edit_event') }}" method="GET" class="m-0 p-0">
+          <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+          <button type="submit" class="btn btn-success mt-1 w-100">Edit event info</button>
+        </form>
+        {% endif%}
       </div>
     </div>
     {% else %}
@@ -34,7 +59,7 @@
         <h5>{{ row['date'] }}</h5>
         <hr class="m-0">
         <div class="col-5">
-          <i class="bi bi-clock-fill"></i> {{ row['start_time'] }} - {{ row['end_time'] }}<br>
+          <i class="bi bi-clock-fill"></i> {{ row['start_time'] }}-{{ row['end_time'] }}<br>
         </div>
         <div class="col-7">
           <i class="bi bi-people-fill"></i> {{ row['capacity'] }} Spaces available
@@ -48,9 +73,23 @@
         {% else %}
           <button type="submit" class="btn btn-warning">Sign up</button>
         {% endif %}
+        </form>
+        <form action="{{  url_for('view_sign_ups') }}" method="GET" class="m-0 p-0">
+          <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+          <button type="submit" class="btn btn-warning mt-1 w-100" disabled>Reserve Taster Gi</button>
+        </form>
+        {% if user.user_role == 'committee' or user.user_role == 'administrator' %}
+        <form action="{{  url_for('view_sign_ups') }}" method="GET" class="m-0 p-0">
+          <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+          <button type="submit" class="btn btn-success mt-1 w-100">View sign ups</button>
+        </form>
+        <form action="{{  url_for('edit_event') }}" method="GET" class="m-0 p-0">
+          <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+          <button type="submit" class="btn btn-success mt-1 w-100">Edit event info</button>
+        </form>
+        {% endif%}
       </div>
     </div>
-    </form>
     {% endif %}
     {% endfor %}
   </div>

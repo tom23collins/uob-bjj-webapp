@@ -32,9 +32,16 @@ def role_required(role):
             if not flask_login.current_user.is_authenticated:
                 flash("You need to be logged in to access this page.")
                 return redirect(url_for('login'))
+            
+            # Bypass if user role is admin
+            if flask_login.current_user.user_role == 'administrator':
+                return f(*args, **kwargs)
+
+            # Check if the user has the required role
             if flask_login.current_user.user_role != role:
                 flash("You don't have the required role to access this page.")
                 return redirect(url_for('index'))
+
             return f(*args, **kwargs)
         return decorated_function
     return decorator
@@ -59,129 +66,60 @@ def user_loader(email):
 def index():
     current_date = datetime.now().strftime('%Y-%m-%d')
     session_data = db_query_values(app, 'SELECT * FROM event_table WHERE date >= %s', (current_date,))
+    
     updated_sessions = []
-    registrations = []
+    registration_event_ids = set()
+    user_registrations = {}
 
     if flask_login.current_user.is_authenticated:
-        registrations = db_query_values(app, 'SELECT * FROM sign_up_log WHERE email = %s;', (flask_login.current_user.id,))
+        registrations = db_query_values(app, 'SELECT event_id, booked_gi FROM sign_up_log WHERE email = %s', (flask_login.current_user.id,))
+        registration_event_ids = {int(registration[0]) for registration in registrations}
+        user_registrations = {int(registration[0]): registration[1] for registration in registrations}
 
-    registration_event_ids = {int(registration[2]) for registration in registrations}
+    session_ids = tuple(session[0] for session in session_data)
+    
+    if session_ids:
+        # Create a placeholder string for the number of session_ids
+        placeholders = ', '.join(['%s'] * len(session_ids))
+        
+        # Fetch registration counts for all events
+        registration_counts = db_query_values(app, f'SELECT event_id, COUNT(*) FROM sign_up_log WHERE event_id IN ({placeholders}) GROUP BY event_id', session_ids)
+        registration_count_dict = {int(row[0]): row[1] for row in registration_counts}
+        
+        # Fetch gis_booked counts for all events
+        gis_booked_counts = db_query_values(app, f'SELECT event_id, COUNT(*) FROM sign_up_log WHERE event_id IN ({placeholders}) AND booked_gi = 1 GROUP BY event_id', session_ids)
+        gis_booked_dict = {int(row[0]): row[1] for row in gis_booked_counts}
+    else:
+        registration_count_dict = {}
+        gis_booked_dict = {}
 
     for session in session_data:
-        registration_count = db_query_values(app, 'SELECT COUNT(*) FROM sign_up_log WHERE event_id = %s', (session[0],))
+        event_id = int(session[0])
+        registered = event_id in registration_event_ids if flask_login.current_user.is_authenticated else False
+        booked_gi = bool(user_registrations.get(event_id, False)) if registered else False
 
         event = {
-            'event_id': session[0],
+            'event_id': event_id,
             'event_name': session[1],
             'date': format_date(session[2]),
             'start_time': datetime.strptime(str(session[3]), "%H:%M:%S").strftime("%H:%M"),
             'end_time': datetime.strptime(str(session[4]), "%H:%M:%S").strftime("%H:%M"),
             'category': session[5],
-            'capacity': session[6] - registration_count[0][0],
+            'capacity': session[6] - registration_count_dict.get(event_id, 0),
             'location': session[7],
             'location_link': session[8],
-            'registered': int(session[0]) in registration_event_ids if flask_login.current_user.is_authenticated else False,
-            'registration_count': registration_count
+            'registered': registered,
+            'registration_count': registration_count_dict.get(event_id, 0),
+            'booked_gi': booked_gi,
+            'gis_booked': gis_booked_dict.get(event_id, 0)
         }
+        
         updated_sessions.append(event)
 
     return render_template('index.html', 
                            event_data=updated_sessions,
                            user=flask_login.current_user)
 
-@app.route('/committee-dashboard')
-@role_required('committee')
-def committee_dashboard():
-    event_data = []
-    user_data = []
-    sign_up_data = []
-
-    # Fetch event data
-    for events in db_query(app, 'SELECT * FROM event_table'):
-        event = {
-            'event_id': events[0],
-            'event_name': events[1],
-            'date': events[2],
-            'start_time': events[3],
-            'end_time': events[4],
-            'category': events[5],
-            'capacity': events[6],
-            'location': events[7]
-        }
-        event_data.append(event)
-
-    # Fetch user data
-    for users in db_query(app, 'SELECT * FROM user_table'):
-        user = {
-            'email': users[0],
-            'first_name': users[2],
-            'last_name': users[3],
-            'medical_info': users[4]
-        }
-        user_data.append(user)
-
-    # Fetch sign-up data
-    for sign_ups in db_query(app, 'SELECT * FROM sign_up_log'):
-        sign_up = {
-            'email': sign_ups[1],
-            'event_id': int(sign_ups[2]),  # Convert event_id to integer
-            'time_stamp': sign_ups[3]
-        }
-        sign_up_data.append(sign_up)
-
-    # Get the selected event ID from the dropdown
-    selected_event_id = request.args.get('event_filter')
-
-    # Filter combined data by the selected event, if any
-    combined_data = []
-    for sign_up in sign_up_data:
-        # Find the corresponding event
-        event = next((e for e in event_data if e['event_id'] == sign_up['event_id']), None)
-        # Find the corresponding user
-        user = next((u for u in user_data if u['email'] == sign_up['email']), None)
-
-        if event and user:
-            if not selected_event_id or str(event['event_id']) == selected_event_id:
-                combined_data.append({
-                    'event_name': event['event_name'],
-                    'event_date': event['date'],
-                    'event_time': f"{event['start_time']} - {event['end_time']}",
-                    'user_name': f"{user['first_name']} {user['last_name']}",
-                    'user_email': user['email'],
-                    'medical_info': user['medical_info'],
-                    'sign_up_time': sign_up['time_stamp']
-                })
-
-    return render_template('/committee/dashboard.html',
-                           combined_data=combined_data,
-                           event_data=event_data,  # Pass event data for the dropdown
-                           user=flask_login.current_user)
-
-@app.route('/new-event', methods=['GET', 'POST'])
-@role_required('committee')
-def create_new_event():
-    if request.method == 'GET':
-        return render_template('/committee/create_new_event.html',
-                               user=flask_login.current_user)
-    
-    sql = """
-    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`, `location_link`)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    values = (
-        request.form['event_name'],
-        request.form['date'],
-        request.form.get('start_time'),
-        request.form.get('end_time'),
-        request.form.get('category'),
-        request.form.get('capacity'),
-        request.form.get('location'),
-        request.form.get('location_link')
-    )
-    db_update(app, sql, values)
-
-    return render_template('/committee/create_new_event.html',
-                           user=flask_login.current_user)
 
 @app.route('/class-sign-up', methods=['GET'])
 @flask_login.login_required
@@ -237,8 +175,22 @@ def login():
         return redirect(url_for('index'))
 
     # If login fails, return an error
-    error = "Invalid email or password"
+    error = "Invalid email or password. Please contact a comittee member if you have forgotten your login."
     return render_template('user_login.html', error=error)
+
+@app.route('/book-taster-gi', methods=['GET'])
+@flask_login.login_required
+def book_taster_gi():
+    if request.method == 'GET':
+        sql = """
+        UPDATE sign_up_log
+        SET booked_gi = 1
+        WHERE email = %s AND event_id = %s;
+        """
+        values = (flask_login.current_user.id,
+                  request.args.get('event_id'))
+        db_update(app, sql, values)
+    return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
@@ -248,6 +200,174 @@ def logout():
 @login_manager.unauthorized_handler
 def unauthorized_handler():
     return redirect(url_for('register'))
+
+
+# Committee views
+@app.route('/sign-ups', methods=['GET'])
+@role_required('committee')
+@flask_login.login_required
+def view_sign_ups():
+    sign_up_data = []
+    event_id = (request.args.get('event_id'),)
+    sql = "SELECT * FROM sign_up_log WHERE event_id = %s"
+    for sign_ups in db_query_values(app, sql, event_id):
+        names = db_query_values(app, "SELECT first_name, last_name FROM user_table WHERE email = %s", (sign_ups[1],))
+        sign_up = {
+            'first_name': names[0][0],
+            'last_name': names[0][1],  # Convert event_id to integer
+            'booked_gi': bool(sign_ups[4])
+        }
+        sign_up_data.append(sign_up)
+    data = db_query_values(app, 'SELECT * FROM event_table WHERE event_id = %s', event_id)
+    event = {
+        'event_id': data[0][0],
+        'event_name': data[0][1],
+        'date': format_date(data[0][2]),
+        'start_time': datetime.strptime(str(data[0][3]), "%H:%M:%S").strftime("%H:%M"),
+        'end_time': datetime.strptime(str(data[0][4]), "%H:%M:%S").strftime("%H:%M"),
+        'category': data[0][5],
+        'capacity': data[0][6],
+        'location': data[0][7]
+    }
+    
+    return render_template('/committee/sign_ups.html',
+                           user=flask_login.current_user,
+                           event_data=event,
+                           data=sign_up_data)
+
+
+@app.route('/new-event', methods=['GET', 'POST'])
+@role_required('committee')
+def create_new_event():
+    if request.method == 'GET':
+        return render_template('/committee/create_new_event.html',
+                               user=flask_login.current_user)
+    
+    sql = """
+    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`, `location_link`)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    values = (
+        request.form['event_name'],
+        request.form['date'],
+        request.form.get('start_time'),
+        request.form.get('end_time'),
+        request.form.get('category'),
+        request.form.get('capacity'),
+        request.form.get('location'),
+        request.form.get('location_link')
+    )
+    db_update(app, sql, values)
+
+    return render_template('/committee/create_new_event.html',
+                           user=flask_login.current_user)
+
+
+@app.route('/edit-event', methods=['GET', 'POST'])
+@role_required('committee')
+@flask_login.login_required
+def edit_event():
+    if request.method == 'GET':
+        event_id = (request.args.get('event_id'),)
+        data = db_query_values(app, 'SELECT * FROM event_table WHERE event_id = %s', event_id)
+        event = {
+            'event_id': data[0][0],
+            'event_name': data[0][1],
+            'date': data[0][2].strftime("%Y-%m-%d"),
+            'start_time': datetime.strptime(str(data[0][3]), "%H:%M:%S").strftime("%H:%M"),
+            'end_time': datetime.strptime(str(data[0][4]), "%H:%M:%S").strftime("%H:%M"),
+            'category': data[0][5],
+            'capacity': data[0][6],
+            'location': data[0][7],
+            'location_link': data[0][8]
+        }
+        return render_template('/committee/edit_event.html', user=flask_login.current_user, data=event)
+    
+    if request.method == 'POST':
+        # SQL Update Statement
+        sql = """
+        UPDATE event_table
+        SET event_name = %s, date = %s, start_time = %s, end_time = %s,
+            category = %s, capacity = %s, location = %s, location_link = %s
+        WHERE event_id = %s
+        """
+        
+        # Extract form data
+        values = (
+            request.form['event_name'],
+            request.form['date'],
+            request.form['start_time'],
+            request.form['end_time'],
+            request.form['category'],
+            request.form['capacity'],
+            request.form['location'],
+            request.form['location_link'],
+            request.form['event_id'],  # Ensure the event_id is passed for the WHERE clause
+        )
+        # Update the database
+        db_update(app, sql, values)
+        
+        return redirect(url_for('index'))
+
+
+@app.route('/members', methods=['GET'])
+@role_required('committee')
+@flask_login.login_required
+def members():
+    data = []
+    for users in db_query(app, 'SELECT * FROM user_table'):
+        user = {
+            'email': users[0],
+            'first_name': users[2],
+            'last_name': users[3],
+            'medical_info': users[4],
+            'user_role': users[5]
+        }
+        data.append(user)
+    return render_template('/committee/members.html',
+                           user=flask_login.current_user,
+                           data=data)
+
+@app.route('/update-password', methods=['GET'])
+@role_required('committee')
+@flask_login.login_required
+def update_password():
+    if request.method == 'GET':
+        # Prepare SQL query to update the password for an existing user
+        sql = """
+        UPDATE user_table
+        SET `password` = %s
+        WHERE `email` = %s
+        """
+        values = (
+            generate_password_hash(request.args.get('password')),  # Hash the new password
+            request.args.get('email'),  # Identify the user by email
+        )
+
+        # Execute the database update function
+        db_update(app, sql, values)
+    return redirect(url_for('members'))
+
+@app.route('/update-role', methods=['GET'])
+@role_required('committee')
+@flask_login.login_required
+def update_role():
+    if request.method == 'GET':
+        # Prepare SQL query to update the password for an existing user
+        sql = """
+        UPDATE user_table
+        SET `user_role` = %s
+        WHERE `email` = %s
+        """
+        values = (
+            request.args.get('user_role'),
+            request.args.get('email'),  # Identify the user by email
+        )
+
+        # Execute the database update function
+        db_update(app, sql, values)
+    return redirect(url_for('members'))
+
 
 if __name__ == "__main__":
     app.run()

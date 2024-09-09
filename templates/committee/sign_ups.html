@@ -1,0 +1,50 @@
+<!-- templates/committee/sign_ups.html -->
+{% extends "base.html" %}
+
+{% block title %}Sign Ups · UoB BJJ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        {% if data == [] %}
+        <p class="text-center">No sign ups to this event</p>
+        {% else %}
+                <div class="col-12 col-md-6 col-lg-4 mx-auto">
+                    <div class="row rounded m-auto p-1 border mt-3 registered_event">
+                        <h2>{{ event_data['event_name'] }}</h2>
+                        <h5>{{ event_data['date'] }}</h5>
+                        <hr class="m-0">
+                        <div class="col-5">
+                        <i class="bi bi-clock-fill"></i> {{ event_data['start_time'] }}-{{ event_data['end_time'] }}<br>
+                        </div>
+                        <div class="col-7">
+                        <i class="bi bi-people-fill"></i> Sign ups: {{ data | length }}
+                        </div>
+                        <div class="col-12 mb-1">
+                        <i class="bi bi-geo-alt-fill"></i><a href="{{ event_data['location_link'] }}" class="text-white" target="_blank">{{ event_data['location'] }}</a>
+                        </div>
+                        <hr class="m-0">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Users signed up:</th>
+                                </tr>
+                            </thead>
+                            <tbody class="rounded">
+                                {% for entry in data %}
+                                <tr>
+                                    <td><i class="bi bi-person-fill"></i> {{ entry['first_name'] }} {{ entry['last_name'] }}</td>
+                                    {% if event_data['category'] == 'Gi' %}
+                                    {% if data[0]['booked_gi']%}
+                                    <td>Taster Gi booked</td>
+                                    {% endif %}
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

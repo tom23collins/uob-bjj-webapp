@@ -22,9 +22,9 @@
           </a>
         </div>
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-          {% if user.is_authenticated and user.user_role == 'committee' %}
+          {% if user.is_authenticated and user.user_role == 'committee' or user.user_role == 'administrator' %}
           <li><a href="/new-event" class="nav-link px-2 active">Create event</a></li>
-          <li><a href="/committee-dashboard" class="nav-link px-2 active">Committee Dashboard</a></li>
+          <li><a href="/members" class="nav-link px-2 active">Members</a></li>
           {% endif %}
           <li><a href="/" class="nav-link px-2 active">Class sign up</a></li>
           {% if user.is_authenticated %}

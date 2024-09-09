@@ -1,0 +1,60 @@
+<!-- templates/committee/sign_ups.html -->
+{% extends "base.html" %}
+
+{% block title %}Members · UoB BJJ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>Email</th>
+                        <th>Medical Info</th>
+                        {% if user.user_role == 'administrator' %}
+                        <th>Change password</th>
+                        <th>User role</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody class="rounded">
+                    {% for entry in data %}
+                    <tr>
+                        <td>{{ entry['first_name'] }}</td>
+                        <td>{{ entry['last_name'] }}</td>
+                        <td>{{ entry['email'] }}</td>
+                        <td>{{ entry['medical_info'] }}</td>
+                        {% if user.user_role == 'administrator' %}
+                        <td>
+                            <form action="{{ url_for('update_password') }}" method="GET" class="m-0 p-0 d-flex align-items-center">
+                                <input type="hidden" name="email" id="email" value="{{ entry['email'] }}">
+                                <input type="password" class="form-control me-1 w-auto" id="password" name='password' required placeholder="Enter password">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('update_role') }}" method="GET" class="m-0 p-0 d-flex align-items-center">
+                                <div class="form-group me-1">
+                                    <select class="form-control w-auto" id="user_role" name="user_role" required>
+                                        <option value="" disabled selected hidden>{{ entry['user_role'] }}</option>
+                                        <option value="user">user</option>
+                                        <option value="committee">committee</option>
+                                        <option value="administrator">administrator</option>
+                                    </select>
+                                </div>
+                                <input type="hidden" name="email" id="email" value="{{ entry['email'] }}">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

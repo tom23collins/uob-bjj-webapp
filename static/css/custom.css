@@ -82,18 +82,27 @@ body,
     border-color: rgba(197, 154, 0, 0.6) !important;
 }
 
+.btn-success {
+    background-color: #181818;
+    border-color: #C59A00;
+    border-width: 2px;
+    color: #FAFAFA; /* Ensure text is readable on the accent color */
+}
+
 .btn-success:disabled {
     background-color: #181818;
-    border-color: #181818;
+    border-color: #C59A00;
+    border-width: 2px;
     color: #FAFAFA; /* Ensure text is readable on the accent color */
 }
 
 .btn-success:hover,
 .btn-success:active,
 .btn-success:focus-visible {
-    background-color: #181818;
-    border-color: #181818;
-    color: #C59A00; /* Ensure text is readable on the accent color */
+    background-color: #181818 !important;
+    border-color: #C59A00 !important;
+    border-width: 2px;
+    color: #C59A00 !important; /* Ensure text is readable on the accent color */
 }
 
 a,
