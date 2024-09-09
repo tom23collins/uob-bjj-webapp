@@ -12,14 +12,13 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
     <link rel="manifest" href="/static/favicon/site.webmanifest">
-    <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
   </head>
   <body class="d-flex align-items-center justify-content-center vh-100 register_bg" style="margin: 0;">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-12 col-md-6 col-lg-4 text-center">
           <a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" height="150px" width="150px" class="rounded">
+            <img src="{{ url_for('static', filename='logo.jpg') }}" height="150px" width="150px" class="rounded">
           </a>
           <form action='register' method='POST'>
             <div class="mb-3 text-start">
@@ -42,7 +41,6 @@
               <label for="medical_info" class="form-label">Medical information</label>
               <input type="text" class="form-control" id="medical_info" name='medical_info' id='medical_info'>
             </div>
-            <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
             <button type="submit" class="btn btn-primary w-100 mb-3">Submit</button>
           </form>
           <p class="text-start">Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
@@ -51,12 +49,5 @@
     </div>
     {{ error }}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script>
-      grecaptcha.ready(function() {
-          grecaptcha.execute('{{ site_key }}', {action: 'submit'}).then(function(token) {
-              document.getElementById('g-recaptcha-response').value = token;
-          });
-      });
-    </script>
   </body>
 </html>
