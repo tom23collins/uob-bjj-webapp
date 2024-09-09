@@ -237,7 +237,7 @@ def login():
         return redirect(url_for('index'))
 
     # If login fails, return an error
-    error = "Invalid email or password"
+    error = "Invalid email or password. Please contact a comittee member if you have forgotten your login."
     return render_template('user_login.html', error=error)
 
 @app.route('/logout')
