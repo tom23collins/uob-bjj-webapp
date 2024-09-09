@@ -89,74 +89,6 @@ def index():
                            event_data=updated_sessions,
                            user=flask_login.current_user)
 
-@app.route('/committee-dashboard')
-@role_required('committee')
-def committee_dashboard():
-    event_data = []
-    user_data = []
-    sign_up_data = []
-
-    # Fetch event data
-    for events in db_query(app, 'SELECT * FROM event_table'):
-        event = {
-            'event_id': events[0],
-            'event_name': events[1],
-            'date': events[2],
-            'start_time': events[3],
-            'end_time': events[4],
-            'category': events[5],
-            'capacity': events[6],
-            'location': events[7]
-        }
-        event_data.append(event)
-
-    # Fetch user data
-    for users in db_query(app, 'SELECT * FROM user_table'):
-        user = {
-            'email': users[0],
-            'first_name': users[2],
-            'last_name': users[3],
-            'medical_info': users[4]
-        }
-        user_data.append(user)
-
-    # Fetch sign-up data
-    for sign_ups in db_query(app, 'SELECT * FROM sign_up_log'):
-        sign_up = {
-            'email': sign_ups[1],
-            'event_id': int(sign_ups[2]),  # Convert event_id to integer
-            'time_stamp': sign_ups[3]
-        }
-        sign_up_data.append(sign_up)
-
-    # Get the selected event ID from the dropdown
-    selected_event_id = request.args.get('event_filter')
-
-    # Filter combined data by the selected event, if any
-    combined_data = []
-    for sign_up in sign_up_data:
-        # Find the corresponding event
-        event = next((e for e in event_data if e['event_id'] == sign_up['event_id']), None)
-        # Find the corresponding user
-        user = next((u for u in user_data if u['email'] == sign_up['email']), None)
-
-        if event and user:
-            if not selected_event_id or str(event['event_id']) == selected_event_id:
-                combined_data.append({
-                    'event_name': event['event_name'],
-                    'event_date': event['date'],
-                    'event_time': f"{event['start_time']} - {event['end_time']}",
-                    'user_name': f"{user['first_name']} {user['last_name']}",
-                    'user_email': user['email'],
-                    'medical_info': user['medical_info'],
-                    'sign_up_time': sign_up['time_stamp']
-                })
-
-    return render_template('/committee/dashboard.html',
-                           combined_data=combined_data,
-                           event_data=event_data,  # Pass event data for the dropdown
-                           user=flask_login.current_user)
-
 @app.route('/new-event', methods=['GET', 'POST'])
 @role_required('committee')
 def create_new_event():
@@ -196,6 +128,39 @@ def class_sign_up():
                   datetime.now())
         db_update(app, sql, values)
     return redirect(url_for('index'))
+
+@app.route('/sign-ups', methods=['GET'])
+@role_required('committee')
+@flask_login.login_required
+def view_sign_ups():
+    sign_up_data = []
+    event_id = (request.args.get('event_id'),)
+    sql = "SELECT * FROM sign_up_log WHERE event_id = %s"
+    for sign_ups in db_query_values(app, sql, event_id):
+        names = db_query_values(app, "SELECT first_name, last_name FROM user_table WHERE email = %s", (sign_ups[1],))
+        sign_up = {
+            'first_name': names[0][0],
+            'last_name': names[0][1],  # Convert event_id to integer
+            'time_stamp': sign_ups[3]
+        }
+        sign_up_data.append(sign_up)
+
+    data = db_query_values(app, 'SELECT * FROM event_table WHERE event_id = %s', event_id)
+    event = {
+        'event_id': data[0][0],
+        'event_name': data[0][1],
+        'date': format_date(data[0][2]),
+        'start_time': datetime.strptime(str(data[0][3]), "%H:%M:%S").strftime("%H:%M"),
+        'end_time': datetime.strptime(str(data[0][4]), "%H:%M:%S").strftime("%H:%M"),
+        'category': data[0][5],
+        'capacity': data[0][6],
+        'location': data[0][7]
+    }
+    
+    return render_template('/committee/sign_ups.html',
+                           user=flask_login.current_user,
+                           event_data=event,
+                           data=sign_up_data)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
