@@ -39,14 +39,6 @@ def role_required(role):
         return decorated_function
     return decorator
 
-def verify_recaptcha(response):
-    payload = {
-        'secret': app.config.get('CAPTCHA_SECRET_KEY'),
-        'response': response
-    }
-    r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=payload)
-    result = r.json()
-    return result.get('success'), result
 
 @login_manager.user_loader
 def user_loader(email):
@@ -208,16 +200,7 @@ def class_sign_up():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        return render_template('user_register.html', site_key=app.config.get('CAPTCHA_SITE_KEY'))
-
-    # Extract the reCAPTCHA token from the form submission
-    recaptcha_response = request.form.get('g-recaptcha-response')
-
-    # Verify the reCAPTCHA response
-    success, recaptcha_result = verify_recaptcha(recaptcha_response)
-    if not success or recaptcha_result.get('score', 0) < 0.5:  # Adjust the score threshold as needed
-        error = "reCAPTCHA verification failed. Please try again."
-        return render_template('user_register.html', error=error, site_key=app.config.get('CAPTCHA_SITE_KEY'))
+        return render_template('user_register.html')
 
     # Prepare SQL query to insert new user
     sql = """
@@ -241,16 +224,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template('user_login.html', site_key=app.config.get('CAPTCHA_SITE_KEY'))
-
-    # Extract the reCAPTCHA token from the form submission
-    recaptcha_response = request.form.get('g-recaptcha-response')
-
-    # Verify the reCAPTCHA response
-    success, recaptcha_result = verify_recaptcha(recaptcha_response)
-    if not success or recaptcha_result.get('score', 0) < 0.5:  # Adjust the score threshold as needed
-        error = "reCAPTCHA verification failed. Please try again."
-        return render_template('user_login.html', error=error, site_key=app.config.get('CAPTCHA_SITE_KEY'))
+        return render_template('user_login.html')
 
     # Extract email and password from the form submission
     email = request.form['email']
@@ -264,7 +238,7 @@ def login():
 
     # If login fails, return an error
     error = "Invalid email or password"
-    return render_template('user_login.html', error=error, site_key=app.config.get('CAPTCHA_SITE_KEY'))
+    return render_template('user_login.html', error=error)
 
 @app.route('/logout')
 def logout():
@@ -273,7 +247,7 @@ def logout():
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return redirect(url_for('login'))
+    return redirect(url_for('register'))
 
 if __name__ == "__main__":
     app.run()
