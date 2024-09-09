@@ -96,32 +96,6 @@ def index():
                            event_data=updated_sessions,
                            user=flask_login.current_user)
 
-@app.route('/new-event', methods=['GET', 'POST'])
-@role_required('committee')
-def create_new_event():
-    if request.method == 'GET':
-        return render_template('/committee/create_new_event.html',
-                               user=flask_login.current_user)
-    
-    sql = """
-    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`, `location_link`)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    values = (
-        request.form['event_name'],
-        request.form['date'],
-        request.form.get('start_time'),
-        request.form.get('end_time'),
-        request.form.get('category'),
-        request.form.get('capacity'),
-        request.form.get('location'),
-        request.form.get('location_link')
-    )
-    db_update(app, sql, values)
-
-    return render_template('/committee/create_new_event.html',
-                           user=flask_login.current_user)
-
 @app.route('/class-sign-up', methods=['GET'])
 @flask_login.login_required
 def class_sign_up():
@@ -222,6 +196,80 @@ def view_sign_ups():
                            user=flask_login.current_user,
                            event_data=event,
                            data=sign_up_data)
+
+
+@app.route('/new-event', methods=['GET', 'POST'])
+@role_required('committee')
+def create_new_event():
+    if request.method == 'GET':
+        return render_template('/committee/create_new_event.html',
+                               user=flask_login.current_user)
+    
+    sql = """
+    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`, `location_link`)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    values = (
+        request.form['event_name'],
+        request.form['date'],
+        request.form.get('start_time'),
+        request.form.get('end_time'),
+        request.form.get('category'),
+        request.form.get('capacity'),
+        request.form.get('location'),
+        request.form.get('location_link')
+    )
+    db_update(app, sql, values)
+
+    return render_template('/committee/create_new_event.html',
+                           user=flask_login.current_user)
+
+
+@app.route('/edit-event', methods=['GET', 'POST'])
+@role_required('committee')
+@flask_login.login_required
+def edit_event():
+    if request.method == 'GET':
+        event_id = (request.args.get('event_id'),)
+        data = db_query_values(app, 'SELECT * FROM event_table WHERE event_id = %s', event_id)
+        event = {
+            'event_id': data[0][0],
+            'event_name': data[0][1],
+            'date': data[0][2].strftime("%Y-%m-%d"),
+            'start_time': datetime.strptime(str(data[0][3]), "%H:%M:%S").strftime("%H:%M"),
+            'end_time': datetime.strptime(str(data[0][4]), "%H:%M:%S").strftime("%H:%M"),
+            'category': data[0][5],
+            'capacity': data[0][6],
+            'location': data[0][7],
+            'location_link': data[0][8]
+        }
+        return render_template('/committee/edit_event.html', user=flask_login.current_user, data=event)
+    
+    if request.method == 'POST':
+        # SQL Update Statement
+        sql = """
+        UPDATE event_table
+        SET event_name = %s, date = %s, start_time = %s, end_time = %s,
+            category = %s, capacity = %s, location = %s, location_link = %s
+        WHERE event_id = %s
+        """
+        
+        # Extract form data
+        values = (
+            request.form['event_name'],
+            request.form['date'],
+            request.form['start_time'],
+            request.form['end_time'],
+            request.form['category'],
+            request.form['capacity'],
+            request.form['location'],
+            request.form['location_link'],
+            request.form['event_id'],  # Ensure the event_id is passed for the WHERE clause
+        )
+        # Update the database
+        db_update(app, sql, values)
+        
+        return redirect(url_for('index'))
 
 
 @app.route('/members', methods=['GET'])
