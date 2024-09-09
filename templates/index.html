@@ -13,12 +13,14 @@
         <h2>{{ row['event_name'] }}</h2>
         <h5>{{ row['date'] }}</h5>
         <hr class="m-0">
-        <div class="col-6">
+        <div class="col-5">
           <i class="bi bi-clock-fill"></i> {{ row['start_time'] }} - {{ row['end_time'] }}<br>
-          <i class="bi bi-geo-alt-fill"></i><a href="{{ row['location_link'] }}" class="text-white" target="_blank">{{ row['location'] }}</a>
         </div>
-        <div class="col-6">
+        <div class="col-7">
           <i class="bi bi-people-fill"></i> {{ row['capacity'] }} Spaces available
+        </div>
+        <div class="col-12 mb-1">
+          <i class="bi bi-geo-alt-fill"></i><a href="{{ row['location_link'] }}" class="text-white" target="_blank">{{ row['location'] }}</a>
         </div>
         <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
         <button type="submit" class="btn btn-success" disabled>Signed up</button>
@@ -31,12 +33,14 @@
         <h2>{{ row['event_name'] }}</h2>
         <h5>{{ row['date'] }}</h5>
         <hr class="m-0">
-        <div class="col-6">
+        <div class="col-5">
           <i class="bi bi-clock-fill"></i> {{ row['start_time'] }} - {{ row['end_time'] }}<br>
-          <i class="bi bi-geo-alt-fill"></i><a href="{{ row['location_link'] }}" class="text-white" target="_blank">{{ row['location'] }}</a>
         </div>
-        <div class="col-6">
+        <div class="col-7">
           <i class="bi bi-people-fill"></i> {{ row['capacity'] }} Spaces available
+        </div>
+        <div class="col-12 mb-1">
+          <i class="bi bi-geo-alt-fill"></i><a href="{{ row['location_link'] }}" class="text-white" target="_blank">{{ row['location'] }}</a>
         </div>
         <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
         {% if row['capacity'] == 0 %}
