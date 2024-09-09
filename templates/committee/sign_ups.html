@@ -34,6 +34,11 @@
                                 {% for entry in data %}
                                 <tr>
                                     <td><i class="bi bi-person-fill"></i> {{ entry['first_name'] }} {{ entry['last_name'] }}</td>
+                                    {% if event_data['category'] == 'Gi' %}
+                                    {% if data[0]['booked_gi']%}
+                                    <td>Taster Gi booked</td>
+                                    {% endif %}
+                                    {% endif %}
                                 </tr>
                                 {% endfor %}
                             </tbody>

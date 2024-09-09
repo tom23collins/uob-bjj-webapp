@@ -66,35 +66,60 @@ def user_loader(email):
 def index():
     current_date = datetime.now().strftime('%Y-%m-%d')
     session_data = db_query_values(app, 'SELECT * FROM event_table WHERE date >= %s', (current_date,))
+    
     updated_sessions = []
-    registrations = []
+    registration_event_ids = set()
+    user_registrations = {}
 
     if flask_login.current_user.is_authenticated:
-        registrations = db_query_values(app, 'SELECT * FROM sign_up_log WHERE email = %s;', (flask_login.current_user.id,))
+        registrations = db_query_values(app, 'SELECT event_id, booked_gi FROM sign_up_log WHERE email = %s', (flask_login.current_user.id,))
+        registration_event_ids = {int(registration[0]) for registration in registrations}
+        user_registrations = {int(registration[0]): registration[1] for registration in registrations}
 
-    registration_event_ids = {int(registration[2]) for registration in registrations}
+    session_ids = tuple(session[0] for session in session_data)
+    
+    if session_ids:
+        # Create a placeholder string for the number of session_ids
+        placeholders = ', '.join(['%s'] * len(session_ids))
+        
+        # Fetch registration counts for all events
+        registration_counts = db_query_values(app, f'SELECT event_id, COUNT(*) FROM sign_up_log WHERE event_id IN ({placeholders}) GROUP BY event_id', session_ids)
+        registration_count_dict = {int(row[0]): row[1] for row in registration_counts}
+        
+        # Fetch gis_booked counts for all events
+        gis_booked_counts = db_query_values(app, f'SELECT event_id, COUNT(*) FROM sign_up_log WHERE event_id IN ({placeholders}) AND booked_gi = 1 GROUP BY event_id', session_ids)
+        gis_booked_dict = {int(row[0]): row[1] for row in gis_booked_counts}
+    else:
+        registration_count_dict = {}
+        gis_booked_dict = {}
 
     for session in session_data:
-        registration_count = db_query_values(app, 'SELECT COUNT(*) FROM sign_up_log WHERE event_id = %s', (session[0],))
+        event_id = int(session[0])
+        registered = event_id in registration_event_ids if flask_login.current_user.is_authenticated else False
+        booked_gi = bool(user_registrations.get(event_id, False)) if registered else False
 
         event = {
-            'event_id': session[0],
+            'event_id': event_id,
             'event_name': session[1],
             'date': format_date(session[2]),
             'start_time': datetime.strptime(str(session[3]), "%H:%M:%S").strftime("%H:%M"),
             'end_time': datetime.strptime(str(session[4]), "%H:%M:%S").strftime("%H:%M"),
             'category': session[5],
-            'capacity': session[6] - registration_count[0][0],
+            'capacity': session[6] - registration_count_dict.get(event_id, 0),
             'location': session[7],
             'location_link': session[8],
-            'registered': int(session[0]) in registration_event_ids if flask_login.current_user.is_authenticated else False,
-            'registration_count': registration_count
+            'registered': registered,
+            'registration_count': registration_count_dict.get(event_id, 0),
+            'booked_gi': booked_gi,
+            'gis_booked': gis_booked_dict.get(event_id, 0)
         }
+        
         updated_sessions.append(event)
 
     return render_template('index.html', 
                            event_data=updated_sessions,
                            user=flask_login.current_user)
+
 
 @app.route('/class-sign-up', methods=['GET'])
 @flask_login.login_required
@@ -153,6 +178,20 @@ def login():
     error = "Invalid email or password. Please contact a comittee member if you have forgotten your login."
     return render_template('user_login.html', error=error)
 
+@app.route('/book-taster-gi', methods=['GET'])
+@flask_login.login_required
+def book_taster_gi():
+    if request.method == 'GET':
+        sql = """
+        UPDATE sign_up_log
+        SET booked_gi = 1
+        WHERE email = %s AND event_id = %s;
+        """
+        values = (flask_login.current_user.id,
+                  request.args.get('event_id'))
+        db_update(app, sql, values)
+    return redirect(url_for('index'))
+
 @app.route('/logout')
 def logout():
     flask_login.logout_user()
@@ -176,10 +215,9 @@ def view_sign_ups():
         sign_up = {
             'first_name': names[0][0],
             'last_name': names[0][1],  # Convert event_id to integer
-            'time_stamp': sign_ups[3]
+            'booked_gi': bool(sign_ups[4])
         }
         sign_up_data.append(sign_up)
-
     data = db_query_values(app, 'SELECT * FROM event_table WHERE event_id = %s', event_id)
     event = {
         'event_id': data[0][0],
