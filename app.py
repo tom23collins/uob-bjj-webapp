@@ -122,6 +122,10 @@ def index():
                            event_data=updated_sessions,
                            user=flask_login.current_user)
 
+@app.route('/about')
+def about():
+    return render_template('about.html',
+                    user=flask_login.current_user)
 
 @app.route('/class-sign-up', methods=['GET'])
 @flask_login.login_required
