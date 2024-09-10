@@ -232,6 +232,7 @@ def view_sign_ups():
     sql = "SELECT * FROM sign_up_log WHERE event_id = %s"
     for sign_ups in db_query_values(app, sql, event_id):
         names = db_query_values(app, "SELECT first_name, last_name FROM user_table WHERE email = %s", (sign_ups[1],))
+        print(bool(sign_ups[4]))
         sign_up = {
             'first_name': names[0][0],
             'last_name': names[0][1],  # Convert event_id to integer
