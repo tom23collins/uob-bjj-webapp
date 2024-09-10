@@ -111,7 +111,9 @@ def index():
             'registered': registered,
             'registration_count': registration_count_dict.get(event_id, 0),
             'booked_gi': booked_gi,
-            'gis_booked': gis_booked_dict.get(event_id, 0)
+            'gis_booked': gis_booked_dict.get(event_id, 0),
+            'event_topic': session[9],
+            'event_coach': session[10],
         }
         
         updated_sessions.append(event)
@@ -132,6 +134,20 @@ def class_sign_up():
         values = (flask_login.current_user.id,
                   request.args.get('event_id'),
                   datetime.now())
+        db_update(app, sql, values)
+    return redirect(url_for('index'))
+
+@app.route('/cancel-sign-up', methods=['GET'])
+@flask_login.login_required
+def cancel_sign_up():
+    if request.method == 'GET':
+        sql = """
+            DELETE FROM sign_up_log
+            WHERE email = %s 
+            AND event_id = %s
+        """
+        values = (flask_login.current_user.id,
+                request.args.get('event_id'))
         db_update(app, sql, values)
     return redirect(url_for('index'))
 
@@ -244,8 +260,8 @@ def create_new_event():
                                user=flask_login.current_user)
     
     sql = """
-    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`, `location_link`)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`, `location_link`, `event_topic`, `event_coach`)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     values = (
         request.form['event_name'],
@@ -255,7 +271,9 @@ def create_new_event():
         request.form.get('category'),
         request.form.get('capacity'),
         request.form.get('location'),
-        request.form.get('location_link')
+        request.form.get('location_link'),
+        request.form.get('event_topic'),
+        request.form.get('event_coach')
     )
     db_update(app, sql, values)
 
@@ -279,7 +297,9 @@ def edit_event():
             'category': data[0][5],
             'capacity': data[0][6],
             'location': data[0][7],
-            'location_link': data[0][8]
+            'location_link': data[0][8],
+            'event_topic': data[0][9],
+            'event_coach': data[0][10]
         }
         return render_template('/committee/edit_event.html', user=flask_login.current_user, data=event)
     
@@ -287,8 +307,8 @@ def edit_event():
         # SQL Update Statement
         sql = """
         UPDATE event_table
-        SET event_name = %s, date = %s, start_time = %s, end_time = %s,
-            category = %s, capacity = %s, location = %s, location_link = %s
+        SET event_name = %s, date = %s, start_time = %s, end_time = %s, category = %s, 
+            capacity = %s, location = %s, location_link = %s, event_topic=%s, event_coach=%s
         WHERE event_id = %s
         """
         
@@ -302,7 +322,9 @@ def edit_event():
             request.form['capacity'],
             request.form['location'],
             request.form['location_link'],
-            request.form['event_id'],  # Ensure the event_id is passed for the WHERE clause
+            request.form['event_topic'],
+            request.form['event_coach'],
+            request.form['event_id'],
         )
         # Update the database
         db_update(app, sql, values)
