@@ -13,6 +13,21 @@
                 <input type="text" class="form-control" id="event_name" name='event_name' value="{{ data['event_name'] }}" required>
             </div>
             <div class="mb-3">
+                <label for="event_topic" class="form-label">Session topic</label>
+                <input type="text" class="form-control" id="event_topic" name='event_topic' value="{{ data['event_topic'] }}" required>
+            </div>
+            <div class="mb-3">
+            <label for="event_coach" class="form-label">Event coach</label>
+            <select class="form-select" aria-label="Default select example" id='event_coach' name="event_coach" required>
+                <option selected disabled>Select Coach</option>
+                <option value="Bradley Hill" {% if data['event_coach'] == 'Bradley Hill' %}selected{% endif %}>Bradley Hill</option>
+                <option value="Bradley Walton" {% if data['event_coach'] == 'Bradley Walton' %}selected{% endif %}>Bradley Walton</option>
+                <option value="Cameran Jheeta" {% if data['event_coach'] == 'Cameran Jheeta' %}selected{% endif %}>Cameran Jheeta</option>
+                <option value="Melissa Hill" {% if data['event_coach'] == 'Melissa Hill' %}selected{% endif %}>Melissa Hill</option>
+                <option value="Ryan Ralph" {% if data['event_coach'] == 'Ryan Ralph' %}selected{% endif %}>Ryan Ralph</option>
+            </select>
+            </div>
+            <div class="mb-3">
                 <label for="date" class="form-label">Date</label>
                 <input type="date" class="form-control" id="date" name='date' value="{{ data['date'] }}" required>
             </div>
