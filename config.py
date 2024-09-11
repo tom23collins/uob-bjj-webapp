@@ -8,6 +8,9 @@ DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_KEY')
 DB_NAME = os.getenv('DB_NAME')
 
-# reCAPTCHA keys
-CAPTCHA_SITE_KEY = os.getenv('CAPTCHA_SITE_KEY')
-CAPTCHA_SECRET_KEY = os.getenv('CAPTCHA_SECRET_KEY')
+# Email config
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 465
+MAIL_USE_SSL = True
+MAIL_USERNAME = 'welcome.uobbjj@gmail.com'
+MAIL_KEY = os.getenv('MAIL_KEY')

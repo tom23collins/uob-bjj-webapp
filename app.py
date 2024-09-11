@@ -6,12 +6,19 @@ import os
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from scripts import format_date
-import requests
+from scripts import format_date, send_welcome_email
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.config.from_object(config)
 app.secret_key = app.config.get('SECRET_KEY')
+app.config['MAIL_SERVER'] = app.config.get('MAIL_SERVER')
+app.config['MAIL_PORT'] = app.config.get('MAIL_PORT')
+app.config['MAIL_USE_SSL'] = app.config.get('MAIL_USE_SSL')
+app.config['MAIL_USERNAME'] = app.config.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = app.config.get('MAIL_KEY')
+
+mail = Mail(app) 
 
 if os.getenv('FLASK_ENV') == 'development':
     app.config['DEBUG'] = True
@@ -175,6 +182,8 @@ def register():
 
     # Execute the database update function
     db_update(app, sql, values)
+
+    send_welcome_email(app, mail, request.form['email'], request.form['first_name'])
 
     # Redirect to the login page after successful registration
     return redirect(url_for('login'))
