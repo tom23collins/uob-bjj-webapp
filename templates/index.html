@@ -34,22 +34,39 @@
           <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
           <button type="submit" class="btn btn-success mt-1 w-100">Cancel sign up</button>
         </form>
-        {% if row['booked_gi']%}
-        <form action="{{  url_for('book_taster_gi') }}" method="GET" class="m-0 p-0"></form>
-          <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
-          <button type="submit" class="btn btn-success mt-1 w-100" disabled>You have reserved a Gi</button>
+        <!-- Gi Booking Section -->
+        {% if row['booked_gi'] %}
+        <!-- User has already reserved a gi for this event -->
+        <form action="{{ url_for('book_taster_gi') }}" method="GET" class="m-0 p-0">
+            <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+            <button type="submit" class="btn btn-success mt-1 w-100" disabled>You have reserved a Gi</button>
         </form>
         {% else %}
-        <form action="{{  url_for('book_taster_gi') }}" method="GET" class="m-0 p-0">
-          <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
-          {% if row['gis_booked'] >= 5 %}
-          <button type="submit" class="btn btn-success mt-1 w-100" disabled>Taster Gi's fully booked</button>
-          {% elif row['category'] != 'Gi' %}
-          <button type="submit" class="btn mt-1 w-100" hidden>Reserve Taster Gi</button>
-          {% else %}
-          <button type="submit" class="btn btn-success mt-1 w-100">Reserve Taster Gi</button>
-          {% endif %}
-        </form>
+            {% if row['gis_booked'] >= 5 %}
+                <!-- Taster Gi's are fully booked -->
+                <form action="#" method="GET" class="m-0 p-0">
+                    <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+                    <button type="button" class="btn btn-success mt-1 w-100" disabled>Taster Gi's fully booked</button>
+                </form>
+            {% elif not row['can_book_gi'] and row['category'] == 'Gi' %}
+                <!-- User cannot book a gi because they've already booked one this week -->
+                <form action="#" method="GET" class="m-0 p-0">
+                    <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+                    <button type="button" class="btn btn-success mt-1 w-100" disabled>You can only reserve one Gi per week</button>
+                </form>
+            {% elif row['category'] != 'Gi' %}
+                <!-- Hide the button if the event category is not 'Gi' -->
+                <!-- You can omit this form or keep it hidden -->
+                <form action="#" method="GET" class="m-0 p-0" style="display: none;">
+                    <!-- Hidden form -->
+                </form>
+            {% else %}
+                <!-- User can reserve a taster gi -->
+                <form action="{{ url_for('book_taster_gi') }}" method="GET" class="m-0 p-0">
+                    <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
+                    <button type="submit" class="btn btn-success mt-1 w-100">Reserve Taster Gi</button>
+                </form>
+            {% endif %}
         {% endif %}
         {% if user.user_role == 'committee' or user.user_role == 'administrator' %}
         <form action="{{  url_for('view_sign_ups') }}" method="GET" class="m-0 p-0">
