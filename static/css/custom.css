@@ -40,7 +40,7 @@ body {
     font-weight: 400; /* Regular by default for body text */
 }
 
-p, span, li, a, div, button {
+p, span, li, a, div, button, small {
     font-family: 'Manrope', sans-serif;
 }
 
@@ -73,6 +73,11 @@ body,
 
 .text-white {
     color: #FAFAFA;
+}
+
+.text-muted {
+    --bs-text-opacity: 1;
+    color: #FAFAFA !important;
 }
 
 .btn-primary:hover,

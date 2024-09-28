@@ -3,7 +3,7 @@ import flask_login
 from db import db_query, db_update, db_query_values
 import config
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from scripts import format_date, send_welcome_email
@@ -77,23 +77,35 @@ def index():
     updated_sessions = []
     registration_event_ids = set()
     user_registrations = {}
+    user_gi_weeks = set()  # Initialize
 
     if flask_login.current_user.is_authenticated:
         registrations = db_query_values(app, 'SELECT event_id, booked_gi FROM sign_up_log WHERE email = %s', (flask_login.current_user.id,))
         registration_event_ids = {int(registration[0]) for registration in registrations}
         user_registrations = {int(registration[0]): registration[1] for registration in registrations}
 
+        # Get event_ids where the user has booked a gi
+        booked_gi_event_ids = [int(registration[0]) for registration in registrations if registration[1]]
+
+        if booked_gi_event_ids:
+            placeholders = ', '.join(['%s'] * len(booked_gi_event_ids))
+            booked_gi_event_dates = db_query_values(app, f'SELECT event_id, date FROM event_table WHERE event_id IN ({placeholders})', booked_gi_event_ids)
+            for event_id, event_date in booked_gi_event_dates:
+                if isinstance(event_date, str):
+                    event_date = datetime.strptime(event_date, '%Y-%m-%d').date()
+                elif isinstance(event_date, datetime):
+                    event_date = event_date.date()
+                event_week = event_date.isocalendar()[1]
+                user_gi_weeks.add(event_week)
+    else:
+        user_gi_weeks = set()
+
     session_ids = tuple(session[0] for session in session_data)
     
     if session_ids:
-        # Create a placeholder string for the number of session_ids
         placeholders = ', '.join(['%s'] * len(session_ids))
-        
-        # Fetch registration counts for all events
         registration_counts = db_query_values(app, f'SELECT event_id, COUNT(*) FROM sign_up_log WHERE event_id IN ({placeholders}) GROUP BY event_id', session_ids)
         registration_count_dict = {int(row[0]): row[1] for row in registration_counts}
-        
-        # Fetch gis_booked counts for all events
         gis_booked_counts = db_query_values(app, f'SELECT event_id, COUNT(*) FROM sign_up_log WHERE event_id IN ({placeholders}) AND booked_gi = 1 GROUP BY event_id', session_ids)
         gis_booked_dict = {int(row[0]): row[1] for row in gis_booked_counts}
     else:
@@ -102,8 +114,23 @@ def index():
 
     for session in session_data:
         event_id = int(session[0])
+        event_date = session[2]
+        if isinstance(event_date, str):
+            event_date = datetime.strptime(event_date, '%Y-%m-%d').date()
+        elif isinstance(event_date, datetime):
+            event_date = event_date.date()
+        event_week = event_date.isocalendar()[1]
+
         registered = event_id in registration_event_ids if flask_login.current_user.is_authenticated else False
         booked_gi = bool(user_registrations.get(event_id, False)) if registered else False
+
+        if flask_login.current_user.is_authenticated:
+            if booked_gi:
+                can_book_gi = True  # User has already booked a gi for this event
+            else:
+                can_book_gi = event_week not in user_gi_weeks  # User hasn't booked a gi this week
+        else:
+            can_book_gi = False  # User is not logged in
 
         event = {
             'event_id': event_id,
@@ -121,6 +148,7 @@ def index():
             'gis_booked': gis_booked_dict.get(event_id, 0),
             'event_topic': session[9],
             'event_coach': session[10],
+            'can_book_gi': can_book_gi,
         }
         
         updated_sessions.append(event)
@@ -241,7 +269,6 @@ def view_sign_ups():
     sql = "SELECT * FROM sign_up_log WHERE event_id = %s"
     for sign_ups in db_query_values(app, sql, event_id):
         names = db_query_values(app, "SELECT first_name, last_name FROM user_table WHERE email = %s", (sign_ups[1],))
-        print(bool(sign_ups[4]))
         sign_up = {
             'first_name': names[0][0],
             'last_name': names[0][1],  # Convert event_id to integer
