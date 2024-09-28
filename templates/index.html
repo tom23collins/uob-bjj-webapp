@@ -103,7 +103,7 @@
           <i class="bi bi-geo-alt-fill"></i><a href="{{ row['location_link'] }}" class="text-white" target="_blank">{{ row['location'] }}</a>
         </div>
         <input type="hidden" name="event_id" id="event_id" value="{{ row['event_id'] }}">
-        {% if row['capacity'] == 0 %}
+        {% if row['capacity'] <= 0 %}
           <button type="button" class="btn btn-warning" disabled>Fully booked</button>
         {% else %}
           <button type="submit" class="btn btn-warning">Sign up</button>
