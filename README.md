@@ -1,7 +1,6 @@
 # uob-bjj-webapp
 
 ## Overview
-Foobar is a Python library for dealing with word pluralization.
 uob-bjj-webapp is a flask webapp to replace the old sign-up system for the University of Birmingham Brazilian Jiu Jitsu taster sessions during the start of the 2024 academic year.
 
 The current system works by collecting interest/signups via social media which is then recorded manually in a spreadsheet. 
