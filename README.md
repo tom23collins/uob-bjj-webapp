@@ -21,10 +21,8 @@ We also discussed some additional features:
 - Progress tracker/dashboard to see how many sessions you have signed up to.
 
 ## Images
-![user-creation-mobile](https://github.com/user-attachments/assets/8a6b6c23-aee6-45e2-8f5b-032d7c4b6899)
-![main-app-mobile](https://github.com/user-attachments/assets/3666eeab-7514-4e09-8f22-124c90df3576)
-![main-app-desktop](https://github.com/user-attachments/assets/e50be438-f496-41e7-9b16-e10d4e37c86a)
-![email-register-confirm](https://github.com/user-attachments/assets/0cfb3fb6-5a39-49c8-9e2f-563d8690be85)
+![mobile-views](https://github.com/user-attachments/assets/6e36c89c-c6f2-4977-9ec0-9fa5bd127f5b)
+![desktop-view+account-creation](https://github.com/user-attachments/assets/b1b09e79-fc9c-480d-8963-22729bfb251a)
 
 ## Results
 - 152 students registered onto the webapp. 
