@@ -20,6 +20,12 @@ We also discussed some additional features:
 - reCAPTCHA when creating accounts to prevent automated spam sign ups. 
 - Progress tracker/dashboard to see how many sessions you have signed up to.
 
+## Images
+![user-creation-mobile](https://github.com/user-attachments/assets/8a6b6c23-aee6-45e2-8f5b-032d7c4b6899)
+![main-app-mobile](https://github.com/user-attachments/assets/3666eeab-7514-4e09-8f22-124c90df3576)
+![main-app-desktop](https://github.com/user-attachments/assets/e50be438-f496-41e7-9b16-e10d4e37c86a)
+![email-register-confirm](https://github.com/user-attachments/assets/0cfb3fb6-5a39-49c8-9e2f-563d8690be85)
+
 ## Results
 - 152 students registered onto the webapp. 
 - 2.14 sessions were signed up to on average by users. 
