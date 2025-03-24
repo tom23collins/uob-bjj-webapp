@@ -20,7 +20,7 @@ We also discussed some additional features:
 - reCAPTCHA when creating accounts to prevent automated spam sign ups. 
 - Progress tracker/dashboard to see how many sessions you have signed up to.
 
-## Images
+## Frontend
 ![mobile-views](https://github.com/user-attachments/assets/6e36c89c-c6f2-4977-9ec0-9fa5bd127f5b)
 ![desktop-view+account-creation](https://github.com/user-attachments/assets/b1b09e79-fc9c-480d-8963-22729bfb251a)
 
