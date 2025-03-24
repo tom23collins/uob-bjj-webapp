@@ -1,4 +1,4 @@
-# uob-bjj-webapp
+# University of Birmingham Brazilian jiu-jitsu webapp
 
 ## Overview
 uob-bjj-webapp is a flask webapp to replace the old sign-up system for the University of Birmingham Brazilian Jiu Jitsu taster sessions during the start of the 2024 academic year.
