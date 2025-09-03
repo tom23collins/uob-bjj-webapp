@@ -1,11 +1,12 @@
 import mysql.connector
+import config
 
 def connection_open(app):
     return mysql.connector.connect(
-        host=app.config.get('DB_HOST'),
-        user=app.config.get('DB_USER'),
-        password=app.config.get('DB_PASSWORD'),
-        database=app.config.get('DB_NAME')
+        host=config.DB_HOST,
+        user=config.DB_USER,
+        password=config.DB_PASSWORD,
+        database=config.DB_NAME,
     )
 
 def db_update(app, sql, values):

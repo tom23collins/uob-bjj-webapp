@@ -1,19 +1,19 @@
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env file
+# Load environment variables from .env file in the project root
 load_dotenv()
 
 # Secret key
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-# Database configuration
+# Database configuration (values must be set in .env)
 DB_HOST = os.getenv('AZURE_MYSQL_HOST')
 DB_USER = os.getenv('AZURE_MYSQL_USER')
 DB_PASSWORD = os.getenv('AZURE_MYSQL_PASSWORD')
 DB_NAME = os.getenv('AZURE_MYSQL_DB')
 
-# Email config
+# Email config (MAIL_KEY must be set in .env)
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_PORT = 465
 MAIL_USE_SSL = True
