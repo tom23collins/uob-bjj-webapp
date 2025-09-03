@@ -10,21 +10,17 @@
       <form action='new-event' method='POST'>
         <div class="mb-3">
           <label for="event_name" class="form-label">Event name</label>
-          <input type="text" class="form-control" id="event_name" name='event_name' placeholder="E.g. Gi taster session" required>
+          <input type="text" class="form-control" id="event_name" name='event_name' value="Nogi taster" required>
         </div>
         <div class="mb-3">
           <label for="event_topic" class="form-label">Session topic</label>
-          <input type="text" class="form-control" id="event_topic" name='event_topic' placeholder="E.g. Omoplata details" required>
+          <input type="text" class="form-control" id="event_topic" name='event_topic' placeholder="E.g. Omoplata details">
         </div>
         <div class="mb-3">
           <label for="event_coach" class="form-label">Event coach</label>
           <select class="form-select" aria-label="Default select example" id='event_coach' name="event_coach" required>
-            <option selected disabled>Select Coach</option>
-            <option value="Bradley Hill">Bradley Hill</option>
             <option value="Bradley Walton">Bradley Walton</option>
-            <option value="Cameran Jheeta">Cameran Jheeta</option>
-            <option value="Melissa Hill">Melissa Hill</option>
-            <option value="Ryan Ralph">Ryan Ralph</option>
+            <option value="Ryan Ralph" selected>Ryan Ralph</option>
           </select>
         </div>
         <div class="mb-3">
@@ -42,23 +38,22 @@
         <div class="mb-3">
           <label for="category" class="form-label">Event type</label>
           <select class="form-select" aria-label="Default select example" id='category' name="category" required>
-            <option selected disabled>Event type</option>
-            <option value="Nogi">Nogi Class</option>
+            <option selected value="Nogi">Nogi Class</option>
             <option value="Gi">Gi Class</option>
             <option value="Social">Social</option>
           </select>
         </div>
         <div class="mb-3">
           <label for="capacity" class="form-label">Capacity</label>
-          <input type="number" class="form-control" id="capacity" name='capacity' placeholder="Typically 30" required>
+          <input type="number" class="form-control" id="capacity" name='capacity' value="35" required>
         </div>
         <div class="mb-3">
           <label for="location" class="form-label">Location Name</label>
-          <input type="text" class="form-control" id="location" name='location' placeholder="Sport and Fitness Center Dojo" required>
+          <input type="text" class="form-control" id="location" name='location' value="Dojo - Sport & Fitness" required>
         </div>
         <div class="mb-3">
           <label for="location_link" class="form-label">Location link from Google Maps</label>
-          <input type="text" class="form-control" id="location_link" name='location_link'>
+          <input type="text" class="form-control" id="location_link" name='location_link' value="https://maps.app.goo.gl/1ZW3e8z5ztEDQowh9">
         </div>
         <button type="submit" class="btn btn-primary w-100">Submit</button>
       </form>
