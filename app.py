@@ -20,8 +20,7 @@ app.config['MAIL_PASSWORD'] = app.config.get('MAIL_KEY')
 
 mail = Mail(app) 
 
-if os.getenv('FLASK_ENV') == 'development':
-    app.config['DEBUG'] = True
+app.config['DEBUG'] = os.getenv('FLASK_DEBUG', '0') == '1'
 
 class User(flask_login.UserMixin):
     pass
