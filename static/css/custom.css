@@ -151,3 +151,70 @@ a.no-hover:hover {
     background-position: center;
     background-repeat: no-repeat;
 }
+
+/* Linktree-style public landing page */
+.links-page {
+    min-height: 100vh;
+    padding: 2rem 1rem 3rem;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(197, 154, 0, 0.18), transparent 32rem),
+        #181818;
+}
+
+.links-shell {
+    width: min(100%, 36rem);
+    max-width: 36rem;
+    margin: 0 auto;
+}
+
+.links-logo {
+    width: 7rem;
+    height: 7rem;
+    object-fit: cover;
+    border: 3px solid #C59A00;
+    box-shadow: 0 0 0 6px rgba(197, 154, 0, 0.12);
+}
+
+.links-handle {
+    color: #C59A00;
+    font-size: 0.9rem;
+}
+
+.links-button {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 4.25rem;
+    padding: 0.9rem 1.25rem;
+    border: 1px solid rgba(197, 154, 0, 0.7);
+    border-radius: 0.8rem;
+    background: rgba(24, 24, 24, 0.88);
+    color: #FAFAFA;
+    text-decoration: none;
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.18);
+    transition: transform 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.links-button:hover,
+.links-button:focus-visible {
+    transform: translateY(-2px);
+    background: #C59A00;
+    color: #181818;
+}
+
+.links-button i {
+    width: 1.5rem;
+    color: #C59A00;
+    font-size: 1.35rem;
+}
+
+.links-button:hover i,
+.links-button:focus-visible i {
+    color: #181818;
+}
+
+.links-button span {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+}

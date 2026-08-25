@@ -2,6 +2,9 @@ from flask import Flask, request, render_template
 from flask_mail import Mail, Message
 
 def send_welcome_email(app, mail, recipient_email, first_name):
+    if not app.config.get('MAIL_KEY'):
+        return
+
     try:
         # Create a new email message
         msg = Message(

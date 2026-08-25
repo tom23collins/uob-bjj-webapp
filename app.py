@@ -105,7 +105,7 @@ def index():
         placeholders = ', '.join(['%s'] * len(session_ids))
         registration_counts = db_query_values(app, f'SELECT event_id, COUNT(*) FROM sign_up_log WHERE event_id IN ({placeholders}) GROUP BY event_id', session_ids)
         registration_count_dict = {int(row[0]): row[1] for row in registration_counts}
-        gis_booked_counts = db_query_values(app, f'SELECT event_id, COUNT(*) FROM sign_up_log WHERE event_id IN ({placeholders}) AND booked_gi = 1 GROUP BY event_id', session_ids)
+        gis_booked_counts = db_query_values(app, f'SELECT event_id, COUNT(*) FROM sign_up_log WHERE event_id IN ({placeholders}) AND booked_gi = TRUE GROUP BY event_id', session_ids)
         gis_booked_dict = {int(row[0]): row[1] for row in gis_booked_counts}
     else:
         registration_count_dict = {}
@@ -161,12 +161,22 @@ def about():
     return render_template('about.html',
                     user=flask_login.current_user)
 
+@app.route('/links')
+def links():
+    return render_template(
+        'links.html',
+        user=flask_login.current_user,
+        instagram_url=app.config['INSTAGRAM_URL'],
+        whatsapp_url=app.config['WHATSAPP_URL'],
+        membership_url=app.config['MEMBERSHIP_URL'],
+    )
+
 @app.route('/class-sign-up', methods=['GET'])
 @flask_login.login_required
 def class_sign_up():
     if request.method == 'GET':
         sql = """
-        INSERT INTO sign_up_log (`email`, `event_id`, `timestamp`) 
+        INSERT INTO sign_up_log (email, event_id, timestamp)
         VALUES (%s, %s, %s)
         """
         values = (flask_login.current_user.id,
@@ -196,7 +206,7 @@ def register():
 
     # Prepare SQL query to insert new user
     sql = """
-    INSERT INTO user_table (`email`, `password`, `first_name`, `last_name`, `medical_info`)
+    INSERT INTO user_table (email, password, first_name, last_name, medical_info)
     VALUES (%s, %s, %s, %s, %s)
     """
     values = (
@@ -240,7 +250,7 @@ def book_taster_gi():
     if request.method == 'GET':
         sql = """
         UPDATE sign_up_log
-        SET booked_gi = 1
+        SET booked_gi = TRUE
         WHERE email = %s AND event_id = %s;
         """
         values = (flask_login.current_user.id,
@@ -300,7 +310,7 @@ def create_new_event():
                                user=flask_login.current_user)
     
     sql = """
-    INSERT INTO event_table (`event_name`, `date`, `start_time`, `end_time`, `category`, `capacity`, `location`, `location_link`, `event_topic`, `event_coach`)
+    INSERT INTO event_table (event_name, date, start_time, end_time, category, capacity, location, location_link, event_topic, event_coach)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     values = (
@@ -398,8 +408,8 @@ def update_password():
         # Prepare SQL query to update the password for an existing user
         sql = """
         UPDATE user_table
-        SET `password` = %s
-        WHERE `email` = %s
+        SET password = %s
+        WHERE email = %s
         """
         values = (
             generate_password_hash(request.args.get('password')),  # Hash the new password
@@ -418,8 +428,8 @@ def update_role():
         # Prepare SQL query to update the password for an existing user
         sql = """
         UPDATE user_table
-        SET `user_role` = %s
-        WHERE `email` = %s
+        SET user_role = %s
+        WHERE email = %s
         """
         values = (
             request.args.get('user_role'),
