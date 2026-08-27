@@ -6,6 +6,7 @@ load_dotenv()
 
 # Secret key
 SECRET_KEY = os.getenv('SECRET_KEY', 'local-demo-secret-key')
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 
 # Use SQLite locally when PostgreSQL is not configured.
 DATABASE_URL = os.getenv('DATABASE_URL')

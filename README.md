@@ -15,6 +15,12 @@ py -m flask --app app run --debug
 Open http://127.0.0.1:5000. The local demo creates `instance/demo.sqlite3` and
 seeds one future event. Email is skipped unless `MAIL_KEY` is configured.
 
+## Admin login
+
+Set `ADMIN_PASSWORD` as a secret environment variable to enable the built-in
+administrator account. The username is `admin`; the password is read from that
+environment variable at runtime.
+
 ## Azure PostgreSQL
 
 The app uses PostgreSQL whenever `DATABASE_URL` or the `AZURE_POSTGRES_*`

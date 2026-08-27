@@ -3,6 +3,7 @@ import flask_login
 from db import db_query, db_update, db_query_values
 import config
 import os
+import hmac
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -24,6 +25,8 @@ app.config['DEBUG'] = os.getenv('FLASK_DEBUG', '0') == '1'
 
 class User(flask_login.UserMixin):
     pass
+
+ADMIN_USERNAME = 'admin'
 
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
@@ -53,8 +56,31 @@ def role_required(role):
     return decorator
 
 
+def create_admin_user():
+    user = User()
+    user.id = ADMIN_USERNAME
+    user.password = None
+    user.first_name = 'Admin'
+    user.last_name = ''
+    user.medical_info = ''
+    user.user_role = 'administrator'
+    return user
+
+
+def is_admin_login(username, password):
+    admin_password = app.config.get('ADMIN_PASSWORD')
+    return bool(
+        admin_password
+        and username == ADMIN_USERNAME
+        and hmac.compare_digest(password, admin_password)
+    )
+
+
 @login_manager.user_loader
 def user_loader(email):
+    if email == ADMIN_USERNAME and app.config.get('ADMIN_PASSWORD'):
+        return create_admin_user()
+
     user_data = db_query_values(app, 'SELECT * FROM user_table WHERE email = %s', (email,))
     if not user_data:
         return None
@@ -230,18 +256,23 @@ def login():
     if request.method == 'GET':
         return render_template('user_login.html')
 
-    # Extract email and password from the form submission
-    email = request.form['email']
+    # Extract login details from the form submission
+    email = request.form['email'].strip()
     password = request.form['password']
 
-    # Load the user using the email
-    user = user_loader(email)
-    if user and check_password_hash(user.password, password):
-        flask_login.login_user(user)
-        return redirect(url_for('index'))
+    if email == ADMIN_USERNAME:
+        if is_admin_login(email, password):
+            flask_login.login_user(create_admin_user())
+            return redirect(url_for('index'))
+    else:
+        # Load the user using the email
+        user = user_loader(email)
+        if user and check_password_hash(user.password, password):
+            flask_login.login_user(user)
+            return redirect(url_for('index'))
 
     # If login fails, return an error
-    error = "Invalid email or password. Please contact a comittee member if you have forgotten your login."
+    error = "Invalid email/username or password. Please contact a committee member if you have forgotten your login."
     return render_template('user_login.html', error=error)
 
 @app.route('/book-taster-gi', methods=['GET'])
