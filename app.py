@@ -27,6 +27,10 @@ class User(flask_login.UserMixin):
     pass
 
 ADMIN_USERNAME = 'admin'
+COACH_NAME_ALIASES = {
+    'Bradley Walton': 'Coach Remy',
+    'Ryan Ralph': 'Coach Ryan',
+}
 
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
@@ -74,6 +78,10 @@ def is_admin_login(username, password):
         and username == ADMIN_USERNAME
         and hmac.compare_digest(password, admin_password)
     )
+
+
+def current_coach_name(coach_name):
+    return COACH_NAME_ALIASES.get(coach_name, coach_name)
 
 
 @login_manager.user_loader
@@ -172,7 +180,7 @@ def index():
             'booked_gi': booked_gi,
             'gis_booked': gis_booked_dict.get(event_id, 0),
             'event_topic': session[9],
-            'event_coach': session[10],
+            'event_coach': current_coach_name(session[10]),
             'can_book_gi': can_book_gi,
         }
         
@@ -240,7 +248,7 @@ def register():
         generate_password_hash(request.form['password']),
         request.form['first_name'],
         request.form['last_name'],
-        request.form['medical_info']
+        request.form.get('medical_info', '')
     )
 
     # Execute the database update function
@@ -380,7 +388,7 @@ def edit_event():
             'location': data[0][7],
             'location_link': data[0][8],
             'event_topic': data[0][9],
-            'event_coach': data[0][10]
+            'event_coach': current_coach_name(data[0][10])
         }
         return render_template('/committee/edit_event.html', user=flask_login.current_user, data=event)
     
