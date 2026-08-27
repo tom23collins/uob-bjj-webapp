@@ -16,12 +16,12 @@
                 <label for="event_topic" class="form-label">Session topic</label>
                 <input type="text" class="form-control" id="event_topic" name='event_topic' value="{{ data['event_topic'] }}" >
             </div>
-            <div class="mb-3"
+            <div class="mb-3">
             <label for="event_coach" class="form-label">Event coach</label>
             <select class="form-select" aria-label="Default select example" id='event_coach' name="event_coach" required>
                 <option selected disabled>Select Coach</option>
-                <option value="Bradley Walton" {% if data['event_coach'] == 'Bradley Walton' %}selected{% endif %}>Bradley Walton</option>
-                <option value="Ryan Ralph" {% if data['event_coach'] == 'Ryan Ralph' %}selected{% endif %}>Ryan Ralph</option>
+                <option value="Coach Remy" {% if data['event_coach'] == 'Coach Remy' %}selected{% endif %}>Coach Remy</option>
+                <option value="Coach Ryan" {% if data['event_coach'] == 'Coach Ryan' %}selected{% endif %}>Coach Ryan</option>
             </select>
             </div>
             <div class="mb-3">
