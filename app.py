@@ -22,6 +22,15 @@ mail = Mail(app)
 
 app.config['DEBUG'] = os.getenv('FLASK_DEBUG', '0') == '1'
 
+COACH_DISPLAY_NAMES = {
+    'Ryan Ralph': 'Coach Ryan',
+    'Ishaq': 'Coach Ishaq',
+}
+
+
+def display_coach_name(coach_name):
+    return COACH_DISPLAY_NAMES.get(coach_name, coach_name)
+
 
 @app.route('/healthz')
 def healthz():
@@ -79,7 +88,11 @@ def user_loader(email):
 @app.route('/')
 def index():
     current_date = datetime.now().strftime('%Y-%m-%d')
-    session_data = db_query_values(app, 'SELECT * FROM event_table WHERE date >= %s', (current_date,))
+    session_data = db_query_values(
+        app,
+        'SELECT * FROM event_table WHERE date >= %s ORDER BY date ASC, start_time ASC',
+        (current_date,)
+    )
     
     updated_sessions = []
     registration_event_ids = set()
@@ -154,7 +167,7 @@ def index():
             'booked_gi': booked_gi,
             'gis_booked': gis_booked_dict.get(event_id, 0),
             'event_topic': session[9],
-            'event_coach': session[10],
+            'event_coach': display_coach_name(session[10]),
             'can_book_gi': can_book_gi,
         }
         
