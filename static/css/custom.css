@@ -291,6 +291,14 @@ a.no-hover:hover {
     max-height: 24rem;
 }
 
+.about-coach-image {
+    width: auto;
+    max-width: 100%;
+    margin-inline: auto;
+    object-fit: contain;
+    object-position: center;
+}
+
 .about-section {
     padding-bottom: 1rem;
     border-bottom: 1px solid rgba(250, 250, 250, 0.12);
