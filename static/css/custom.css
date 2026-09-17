@@ -274,6 +274,11 @@ a.no-hover:hover {
     border-radius: 0.85rem;
 }
 
+.about-side-image,
+.about-stack-image {
+    object-position: center top;
+}
+
 .about-hero-image {
     max-height: 30rem;
 }
