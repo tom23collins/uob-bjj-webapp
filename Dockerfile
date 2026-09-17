@@ -1,5 +1,6 @@
-# Use an official Python runtime as a parent image
-FROM python:3.8-slim
+# Python 3.12 has official ARM64 images and matches the versions required by
+# the current dependency set (notably NumPy 2.x).
+FROM python:3.12-slim-bookworm
 
 # Set the working directory in the container
 WORKDIR /app
@@ -10,11 +11,12 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 5000 available to the world outside this container
 EXPOSE 5000
+ENV PORT=5000
 
-# Set an environment variable to switch between development and production
-ENV FLASK_ENV=production
+# Run as an unprivileged user in production.
+RUN useradd --create-home --uid 10001 appuser \
+    && chown -R appuser:appuser /app
+USER appuser
 
-# Run the appropriate server based on the environment
-CMD if [ "$FLASK_ENV" = "development" ]; then flask run --host=0.0.0.0 --port=5000; else gunicorn --bind 0.0.0.0:5000 wsgi:app; fi
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 60 wsgi:app"]

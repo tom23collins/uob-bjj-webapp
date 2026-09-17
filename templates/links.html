@@ -12,8 +12,7 @@
       <div class="links-shell text-center">
         <img src="{{ url_for('static', filename='logo.jpg') }}" alt="UoB Brazilian Jiu Jitsu logo" class="links-logo rounded-circle">
         <h1 class="mt-4 mb-1">UoB Brazilian Jiu Jitsu</h1>
-        <p class="links-handle mb-2">@uob_bjj</p>
-        <p class="mb-4">Train hard. Learn together. Everyone is welcome.</p>
+        <p class="links-handle mb-4">@uob_bjj</p>
 
         <div class="d-grid gap-3">
           <a class="links-button" href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">
@@ -25,8 +24,8 @@
           <a class="links-button" href="{{ url_for('index') }}">
             <i class="bi bi-calendar-check"></i><span>Sign up for a taster session</span><i class="bi bi-arrow-right"></i>
           </a>
-          <a class="links-button" href="{{ membership_url }}" target="_blank" rel="noopener noreferrer">
-            <i class="bi bi-person-plus"></i><span>Buy your club membership</span><i class="bi bi-arrow-up-right"></i>
+          <a class="links-button" href="{{ url_for('membership') }}">
+            <i class="bi bi-person-plus"></i><span>Membership information</span><i class="bi bi-arrow-right"></i>
           </a>
         </div>
 

@@ -1,0 +1,61 @@
+services:
+  app:
+    build:
+      context: .
+    image: uob-bjj-webapp:local
+    restart: unless-stopped
+    init: true
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
+      DATABASE_URL: postgresql://${POSTGRES_USER:?Set POSTGRES_USER in .env}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      DEMO_MODE: "0"
+      FLASK_DEBUG: "0"
+      PORT: "5000"
+      MAIL_KEY: ${MAIL_KEY:-}
+      INSTAGRAM_URL: ${INSTAGRAM_URL:-https://instagram.com/uob_bjj}
+      WHATSAPP_URL: ${WHATSAPP_URL:-https://linktr.ee/uobbjj}
+      MEMBERSHIP_URL: ${MEMBERSHIP_URL:-https://www.usbonline.bham.ac.uk/JoinAtHome/}
+    ports:
+      # Keep the app off the public interface. Use Cloudflare Tunnel or a
+      # reverse proxy on the Pi to publish it.
+      - "127.0.0.1:8080:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/healthz', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    init: true
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Start this service only after configuring a public hostname in the
+  # Cloudflare dashboard. The tunnel token is intentionally kept in .env.
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    profiles: ["public"]
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN:-}
+
+volumes:
+  postgres_data:

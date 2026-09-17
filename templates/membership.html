@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Membership information · UoB BJJ{% endblock %}
+
+{% block content %}
+<main class="content-page membership-page py-4 py-lg-5">
+  <div class="container">
+    <section class="membership-intro text-center mb-5">
+      <p class="eyebrow">Join UoB Brazilian Jiu-Jitsu</p>
+      <h1>How to buy a membership</h1>
+      <p class="lead mx-auto">Follow the steps below to purchase your University of Birmingham Sport and Fitness membership and join our club.</p>
+      <a class="btn btn-primary" href="{{ membership_url }}" target="_blank" rel="noopener noreferrer">Start your membership purchase <i class="bi bi-arrow-up-right"></i></a>
+    </section>
+
+    <section class="membership-steps" aria-label="Membership purchase steps">
+      <article class="membership-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h2>Find Sport and Fitness</h2>
+          <p>Search <strong>Sport and Fitness UoB</strong> in your browser and select the University of Birmingham Sport and Fitness result.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-01.png') }}" alt="Google search results for Sport and Fitness UoB" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h2>Open Our Sport Clubs</h2>
+          <p>Navigate to the <strong>Sport</strong> section, then select <strong>Our Sport Clubs</strong>.</p>
+          <div class="step-images">
+            <img src="{{ url_for('static', filename='images/membership/membership-step-02.png') }}" alt="University of Birmingham Sport and Fitness community membership page" loading="lazy">
+            <img src="{{ url_for('static', filename='images/membership/membership-step-03.png') }}" alt="Sport clubs listed alphabetically" loading="lazy">
+          </div>
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h2>Select Brazilian Jiu-Jitsu</h2>
+          <p>In the clubs beginning with <strong>B</strong>, find <strong>Brazilian Jiu-Jitsu</strong> and click on us.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-04.png') }}" alt="Brazilian Jiu-Jitsu listed under B in Sport Clubs" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h2>Click Join Us</h2>
+          <p>Scroll to the bottom of our club page. Have a little read through if you are interested, then click <strong>Join Us</strong>.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-05.png') }}" alt="Join Us button on the Brazilian Jiu-Jitsu club page" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h2>Log in to Sport and Fitness</h2>
+          <p>Enter your University email and PIN, then log in. Your PIN should have been set up with Sport and Fitness during onboarding. If you do not have one, contact Sport and Fitness to find out how to set yours up.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-06.png') }}" alt="Sport and Fitness online booking login page" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">6</div>
+        <div class="step-content">
+          <h2>Open Memberships</h2>
+          <p>Once logged in, find the highlighted <strong>Memberships</strong> tab and click it.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-07.png') }}" alt="Memberships tab in the Sport and Fitness booking portal" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">7</div>
+        <div class="step-content">
+          <h2>Purchase a new membership</h2>
+          <p>On the Memberships page, select the green <strong>Purchase a new Membership</strong> button.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-08.png') }}" alt="Purchase a new Membership button" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">8</div>
+        <div class="step-content">
+          <h2>Choose new or renewing</h2>
+          <p>Select the section that applies to you, whether you are buying a new membership or renewing an existing one, and click <strong>Next</strong>.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-09.png') }}" alt="Sign up or renew your membership screen" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">9</div>
+        <div class="step-content">
+          <h2>Select Sports Clubs A to L</h2>
+          <p>Choose <strong>Sports Clubs A to L</strong>, then click <strong>Next</strong>.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-10.png') }}" alt="Sports Clubs A to L option selected" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">10</div>
+        <div class="step-content">
+          <h2>Choose the right BJJ membership</h2>
+          <p>Scroll down to the clubs beginning with B and select the category that matches what you are buying:</p>
+          <ul>
+            <li>Student buying the full year: <strong>BJJ</strong></li>
+            <li>Non-student buying the full year: <strong>BJJ Community</strong></li>
+            <li>Student buying a term: <strong>BJJ Term</strong></li>
+            <li>Non-student buying a term: <strong>BJJ Community Term</strong></li>
+          </ul>
+          <p>Once selected, scroll to the bottom and click <strong>Next</strong>.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-11.png') }}" alt="BJJ membership categories in the Sport and Fitness portal" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">11</div>
+        <div class="step-content">
+          <h2>Check the membership details</h2>
+          <p>Make sure you are happy with the details and click <strong>Next</strong>.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-12.png') }}" alt="Membership details and price summary" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">12</div>
+        <div class="step-content">
+          <h2>Complete your personal details</h2>
+          <p>Fill out your personal details. At the bottom, read and agree to the three highlighted sections, then click <strong>Next</strong>.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-13.png') }}" alt="Personal details and agreement checkboxes" loading="lazy">
+        </div>
+      </article>
+
+      <article class="membership-step">
+        <div class="step-number">13</div>
+        <div class="step-content">
+          <h2>Pay and finish</h2>
+          <p>Check everything on the summary page. When you are happy, select <strong>Pay and Finish</strong> and complete checkout on the next page. You should receive an email confirmation of your purchase.</p>
+          <img src="{{ url_for('static', filename='images/membership/membership-step-14.png') }}" alt="Final membership summary with Pay and Finish button" loading="lazy">
+        </div>
+      </article>
+    </section>
+
+    <section class="membership-prices info-card mt-5">
+      <h2>Membership prices</h2>
+      <div class="price-list">
+        <div><span>Student yearly</span><strong>£105</strong></div>
+        <div><span>Student termly</span><strong>£60</strong></div>
+        <div><span>External yearly</span><strong>£115</strong></div>
+      </div>
+      <p class="small text-muted mb-0 mt-3">Registering for this webapp does not make you a club member. You need to complete the Sport and Fitness membership purchase above.</p>
+    </section>
+  </div>
+</main>
+{% endblock %}

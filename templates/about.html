@@ -1,31 +1,134 @@
-<!-- templates/about_the_club.html -->
 {% extends "base.html" %}
 
-{% block title %}About · UoB BJJ{% endblock %}
-
-{% block background %}
-about-bg
-{% endblock %}
+{% block title %}About the club · UoB BJJ{% endblock %}
 
 {% block content %}
-<div class="container text-center">
-  <div class="row">
-    <h1 class="mt-2">About the club</h1>
-    <h5>The UoB Brazilian Jiu Jitsu club is one of the uni’s newest clubs. Starting in the second term of 2023 we quickly became an established club at UoB, we now have a full timetable of 5 sessions per week, an elite coaching staff and a diverse team which is always growing.</h5>
-    <p>We accept everybody, no matter who you are or what your goals are; we aim to make our club a place where anybody can train and learn high quality BJJ. Whether you want to compete, or are just looking to give BJJ a go, we can assure you, we have a place for you.</p>
-    <p>What sets us apart from other clubs is our elite coaching staff led by Bradley Hill, head coach and founder of Royal Jiu Jitsu, our affiliate team.</p>
-    <p>We are very proud to have talents such as Melissa Hill, Brad Walton and Cameran Jheeta on our coaching staff.</p>
-    <p>Melissa Hill is a National champion at purple belt who recently won her debut at Polaris Professional, the worlds biggest BJJ promotion event. She’s a rising star in the UK competition scene, and also a great advocate for women’s BJJ, running very popular women’s self defence courses.</p>
-    <p>Melissa was a National champion at purple belt, she’s also a Polaris invitational champion, Europes biggest BJJ promotion event. Melissa a rising star in the UK competition scene, and a great advocate for women’s BJJ, running very popular women’s self defence courses.</p>
-    <p>Brad is an elite competitor who started training under Royal Jiu Jitsu in 2022, since then he has won the British Grand Prix, the nogi British open, 2x IBJJF Paris open, 2x IBJJF London open, IBJJF Rome Open, on top of that he has taken the podium in the biggest competitions in the world, medalling at the IBJJF PAN American Championships, the IBJJF European Championships, and the IBJJF World Championships.</p>
-    <p>Cameran is a black belt at Royal Jiu Jitsu who has been a student of Bradley Hill for almost 15 years achieving high success on the junior circuit, winning the IBJJF Pan American Championships. Since then Cameran has devoted his time to passing on his wisdom and knowledge to the next generation.</p>
-    <p>With us you’ll have the opportunity to compete in local and National level competitions as well as the annual university league competition. And we’ll be there with you every step of the way to offer our guidance and support.</p>
-    <h5>Key contact</h5>
-    <p>President: <a href="mailto:s.h.clarke@bham.ac.uk">Stanley Clarke</a></p>
-    <h5>Links</h5>
-    <a href="mailto:s.h.clarke@bham.ac.uk" target="_blank">Contact Us</a>
-    <a href="https://www.usbonline.bham.ac.uk/JoinAtHome/" target="_blank">Join Us</a>
-    <a href="https://instagram.com/uob_bjj?igshid=MjEwN2IyYWYwYw==" target="_blank">Follow us on instagram</a>
+<main class="content-page about-page py-4 py-lg-5">
+  <div class="container">
+    <section class="about-hero mb-5">
+      <div class="row align-items-center g-4 g-lg-5">
+        <div class="col-lg-6">
+          <p class="eyebrow">University of Birmingham</p>
+          <h1 class="display-4">About the club</h1>
+          <p class="lead">Brazilian Jiu-Jitsu is a grappling sport involving takedowns and submissions. It is highly technical and physically demanding, while fostering a supportive and challenging training environment.</p>
+          <p>With world-class coaches, great facilities and a range of levels, whether you are a white or brown belt, University of Birmingham Brazilian Jiu-Jitsu is the place for you. Our priorities are to have fun, respect others and establish great friendships under the umbrella of this amazing sport.</p>
+        </div>
+        <div class="col-lg-6">
+          <img src="{{ url_for('static', filename='images/about/about-team.jpeg') }}" class="about-hero-image" alt="UoB Brazilian Jiu-Jitsu club members together in the dojo" loading="eager">
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section mb-5">
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <h2>Our community</h2>
+          <p>With our strong and lively social community, external and internal competitions, support to charitable fundraisers and our link with the prestigious Royal Jiu-Jitsu, we are a diverse club with many different dimensions that all our members can get involved in.</p>
+          <p>We accept everybody, no matter who you are or what your goals are. We aim to make our club a place where anybody can train and learn high-quality BJJ. Whether you want to compete or are just looking to give BJJ a go, we can assure you that we have a place for you.</p>
+        </div>
+        <div class="col-lg-4">
+          <img src="{{ url_for('static', filename='images/about/about-hero.jpeg') }}" class="about-side-image" alt="BJJ students listening during training" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section mb-5">
+      <div class="section-heading">
+        <p class="eyebrow">Train with us</p>
+        <h2>Training, facilities and coaching</h2>
+      </div>
+      <p>Our taster sessions are completely free for the first two weeks of term: w/c 21 September and w/c 28 September, so there is absolutely no reason not to get involved.</p>
+      <div class="row g-4 mt-1">
+        <div class="col-md-5">
+          <div class="info-card h-100">
+            <h3>Weekly timetable</h3>
+            <p>We train in the University of Birmingham Sport and Fitness Centre Dojo six hours per week:</p>
+            <ul class="schedule-list">
+              <li><strong>Monday</strong><span>2–4pm</span></li>
+              <li><strong>Thursday</strong><span>2–4pm</span></li>
+              <li><strong>Saturday</strong><span>4–6pm</span></li>
+            </ul>
+            <p class="small mb-0">The first hour is gi (traditional wear) and the second hour is no-gi (sportswear). Every session is optional, so you can tailor training to your schedule.</p>
+          </div>
+        </div>
+        <div class="col-md-7">
+          <img src="{{ url_for('static', filename='images/about/about-training.jpeg') }}" class="about-wide-image" alt="Students training Brazilian Jiu-Jitsu in the dojo" loading="lazy">
+        </div>
+      </div>
+      <div class="row g-4 mt-1 align-items-center">
+        <div class="col-md-7 order-md-2">
+          <h3>Royal Jiu-Jitsu open mat</h3>
+          <p>New this year, we have an open mat at Royal Jiu-Jitsu every Sunday from 10am–12pm. This is open to members with more than one term of experience.</p>
+          <p>Our affiliation with Royal Jiu-Jitsu has enabled us to get world-class coaching from Ryan Ralph and Remy Blackwood. Both compete at very high levels, nationally and internationally, with Remy recently competing in the IBJJF World Championships.</p>
+        </div>
+        <div class="col-md-5 order-md-1">
+          <img src="{{ url_for('static', filename='images/about/about-coach-1.png') }}" class="about-side-image" alt="Royal Jiu-Jitsu coaches in the dojo" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section mb-5">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="info-card h-100">
+            <h2>Social!</h2>
+            <p>Our club is a great community, projected to have 100 members this year. Regular sober and non-sober socials are organised weekly. With us being keen attendees of Sports Night every Wednesday, you will not miss out.</p>
+            <p>If that is less your style, bouldering, bowling and dinners are alternative options. Socials are planned in advance so you can fit them into your busy schedule, with impromptu socials bouncing about as well.</p>
+            <p class="mb-0">Socials, competitions and other club details are announced on the community WhatsApp, Instagram, leaflets and by our committee members.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="info-card h-100">
+            <h2>Competitions!</h2>
+            <p>We are putting more emphasis on competitions this year. We are aiming to have at least one external competition day and one free internal competition day per semester.</p>
+            <p class="mb-0">Opportunities to test your BJJ skills, find your level and challenge your friends will be plentiful. External competition days are a great way to understand your game, support your teammates and have a great day out.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section mb-5">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-7">
+          <h2>Our coaching team</h2>
+          <p>What sets us apart from other clubs is our elite coaching staff, led by Bradley Hill, head coach and founder of Royal Jiu-Jitsu, our affiliate team. We are very proud to have talents such as Melissa Hill, Brad Walton and Cameran Jheeta on our coaching staff.</p>
+          <p>Melissa Hill is a national champion at purple belt who recently won her debut at Polaris Professional, one of the world's biggest BJJ promotion events. She is a rising star in the UK competition scene and a great advocate for women's BJJ, running popular women's self-defence courses.</p>
+          <p>Brad is an elite competitor who started training under Royal Jiu-Jitsu in 2022. Since then he has won the British Grand Prix, the no-gi British Open, two IBJJF Paris Opens, two IBJJF London Opens and the IBJJF Rome Open. He has also reached the podium at the IBJJF Pan American, European and World Championships.</p>
+          <p class="mb-0">Cameran is a black belt at Royal Jiu-Jitsu who has been a student of Bradley Hill for almost 15 years. After achieving high success on the junior circuit, including winning the IBJJF Pan American Championships, Cameran has devoted his time to passing his wisdom and knowledge to the next generation.</p>
+        </div>
+        <div class="col-lg-5">
+          <div class="about-image-stack">
+            <img src="{{ url_for('static', filename='images/about/about-coach-2.png') }}" class="about-stack-image about-stack-image-front" alt="BJJ coaches standing together" loading="lazy">
+            <img src="{{ url_for('static', filename='images/about/about-training-line.jpeg') }}" class="about-stack-image about-stack-image-back" alt="BJJ club members lined up in the dojo" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section mb-5">
+      <div class="row g-4 align-items-center">
+        <div class="col-md-5">
+          <img src="{{ url_for('static', filename='images/about/about-social-2.png') }}" class="about-wide-image" alt="UoB BJJ members at a social event" loading="lazy">
+        </div>
+        <div class="col-md-7">
+          <h2>Membership prices</h2>
+          <div class="price-list">
+            <div><span>Student yearly</span><strong>£105</strong></div>
+            <div><span>Student termly</span><strong>£60</strong></div>
+            <div><span>External yearly</span><strong>£115</strong></div>
+          </div>
+          <a class="btn btn-primary mt-3" href="{{ url_for('membership') }}">How to buy a membership</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-panel text-center">
+      <p class="eyebrow">Get in touch</p>
+      <h2>We look forward to meeting you</h2>
+      <p>Instagram: <a href="https://instagram.com/uob_bjj" target="_blank" rel="noopener noreferrer">@uob_bjj</a></p>
+      <p>WhatsApp community: <a href="https://chat.whatsapp.com/Ha6uLpfD5O8JJBG4ioF5hP" target="_blank" rel="noopener noreferrer">Join the community</a></p>
+      <p class="mb-0">Email: <a href="mailto:ixp316@student.bham.ac.uk">ixp316@student.bham.ac.uk</a></p>
+    </section>
   </div>
-</div>
+</main>
 {% endblock %}

@@ -22,6 +22,14 @@ mail = Mail(app)
 
 app.config['DEBUG'] = os.getenv('FLASK_DEBUG', '0') == '1'
 
+
+@app.route('/healthz')
+def healthz():
+    """Small readiness endpoint for Docker and reverse proxies."""
+    db_query(app, 'SELECT 1')
+    return {'status': 'ok'}, 200
+
+
 class User(flask_login.UserMixin):
     pass
 
@@ -160,6 +168,14 @@ def index():
 def about():
     return render_template('about.html',
                     user=flask_login.current_user)
+
+@app.route('/membership')
+def membership():
+    return render_template(
+        'membership.html',
+        user=flask_login.current_user,
+        membership_url=app.config['MEMBERSHIP_URL'],
+    )
 
 @app.route('/links')
 def links():

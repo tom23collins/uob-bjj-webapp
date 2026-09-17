@@ -218,3 +218,241 @@ a.no-hover:hover {
     text-align: center;
     font-weight: 700;
 }
+
+/* Content pages */
+.content-page {
+    min-height: calc(100vh - 132px);
+}
+
+.content-page h1,
+.content-page h2,
+.content-page h3 {
+    color: #FAFAFA;
+}
+
+.content-page h2 {
+    margin-bottom: 1rem;
+}
+
+.content-page h3 {
+    font-size: 1.35rem;
+}
+
+.content-page p,
+.content-page li {
+    color: rgba(250, 250, 250, 0.84);
+    line-height: 1.7;
+}
+
+.eyebrow {
+    margin-bottom: 0.65rem;
+    color: #C59A00 !important;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.about-hero {
+    padding: clamp(1.5rem, 4vw, 3rem);
+    border: 1px solid rgba(197, 154, 0, 0.45);
+    border-radius: 1rem;
+    background: linear-gradient(120deg, rgba(197, 154, 0, 0.12), rgba(24, 24, 24, 0.9) 45%);
+}
+
+.about-hero .lead,
+.membership-intro .lead {
+    color: #FAFAFA;
+}
+
+.about-hero-image,
+.about-wide-image,
+.about-side-image {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 0.85rem;
+}
+
+.about-hero-image {
+    max-height: 30rem;
+}
+
+.about-wide-image {
+    height: 18rem;
+}
+
+.about-side-image {
+    max-height: 24rem;
+}
+
+.about-section {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(250, 250, 250, 0.12);
+}
+
+.section-heading {
+    margin-bottom: 1rem;
+}
+
+.info-card {
+    padding: 1.5rem;
+    border: 1px solid rgba(197, 154, 0, 0.45);
+    border-radius: 0.85rem;
+    background: rgba(250, 250, 250, 0.04);
+}
+
+.schedule-list,
+.price-list {
+    margin: 1.25rem 0;
+    padding: 0;
+    list-style: none;
+}
+
+.schedule-list li,
+.price-list div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(250, 250, 250, 0.12);
+}
+
+.schedule-list li:last-child,
+.price-list div:last-child {
+    border-bottom: 0;
+}
+
+.schedule-list span,
+.price-list strong {
+    color: #C59A00;
+}
+
+.about-image-stack {
+    position: relative;
+    min-height: 26rem;
+}
+
+.about-stack-image {
+    position: absolute;
+    width: 72%;
+    height: 18rem;
+    object-fit: cover;
+    border: 4px solid #181818;
+    border-radius: 0.85rem;
+}
+
+.about-stack-image-front {
+    top: 0;
+    right: 0;
+    z-index: 2;
+}
+
+.about-stack-image-back {
+    bottom: 0;
+    left: 0;
+}
+
+.contact-panel {
+    padding: 2rem 1rem;
+    border-radius: 1rem;
+    background: linear-gradient(120deg, rgba(197, 154, 0, 0.16), rgba(250, 250, 250, 0.04));
+}
+
+.membership-intro {
+    max-width: 52rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.membership-steps {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 54rem;
+    margin: 0 auto;
+}
+
+.membership-step {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(197, 154, 0, 0.4);
+    border-radius: 0.9rem;
+    background: rgba(250, 250, 250, 0.035);
+}
+
+.step-number {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border-radius: 50%;
+    background: #C59A00;
+    color: #181818;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.step-content h2 {
+    margin-top: 0.35rem;
+    font-size: 1.45rem;
+}
+
+.step-content img {
+    display: block;
+    width: min(100%, 38rem);
+    max-height: 27rem;
+    margin-top: 1rem;
+    object-fit: contain;
+    border: 1px solid rgba(250, 250, 250, 0.16);
+    border-radius: 0.5rem;
+    background: #FAFAFA;
+}
+
+.step-images {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.step-images img {
+    width: 100%;
+    max-height: 20rem;
+}
+
+.membership-prices {
+    max-width: 54rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+@media (max-width: 575.98px) {
+    .membership-step {
+        grid-template-columns: 2.35rem 1fr;
+        gap: 0.85rem;
+        padding: 1rem;
+    }
+
+    .step-number {
+        width: 2.35rem;
+        height: 2.35rem;
+        font-size: 1rem;
+    }
+
+    .step-content h2 {
+        font-size: 1.2rem;
+    }
+
+    .step-images {
+        grid-template-columns: 1fr;
+    }
+
+    .about-image-stack {
+        min-height: 21rem;
+    }
+
+    .about-stack-image {
+        height: 14rem;
+    }
+}

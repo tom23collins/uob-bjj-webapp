@@ -27,6 +27,67 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
 The app creates the three required tables automatically on its first connection.
 Do not set `DEMO_MODE` when connecting to PostgreSQL.
 
+## Render deployment
+
+For a public two-week deployment, Render is the easiest option. The
+`render.yaml` Blueprint creates a Docker web service and a small PostgreSQL
+database in Frankfurt, then supplies the app with the database connection
+string automatically.
+
+1. Push this repository to GitHub or GitLab.
+2. In Render, choose **New → Blueprint**, select the repository, and deploy
+   `render.yaml`.
+3. Choose the **Free** plans when prompted.
+4. After the first deploy, add your existing domain under the web service's
+   **Settings → Custom Domains** and follow Render's DNS instructions.
+
+The free web service can sleep after inactivity, so its first request after a
+quiet period may be slow. The free PostgreSQL database is limited to 1 GB,
+has no backups, and expires after 30 days; export the data before the expiry
+if you need to keep it. Render's free database therefore suits this
+short-lived deployment, but should not be treated as the permanent copy of
+important sign-ups.
+
+## Raspberry Pi deployment
+
+The cheapest short-term hosting option is to run the app and PostgreSQL on a
+Raspberry Pi you already own. Docker publishes only the app on
+`127.0.0.1:8080`; PostgreSQL stays on the private Compose network and its data
+is stored in the `postgres_data` volume.
+
+On a 64-bit Raspberry Pi OS installation with Docker and Compose installed:
+
+```bash
+git clone <your-repository-url> uob-bjj-webapp
+cd uob-bjj-webapp
+cp .env.example .env
+openssl rand -hex 32              # put this value in SECRET_KEY
+openssl rand -base64 24           # put this value in POSTGRES_PASSWORD
+docker compose up -d --build
+docker compose ps
+curl http://127.0.0.1:8080/healthz
+```
+
+Do not commit `.env`. Back up the database before changing hardware or the
+Compose volume:
+
+```bash
+docker compose exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > backup.sql
+```
+
+For a public URL, Cloudflare Tunnel is the simplest low-cost option. Your
+domain needs to use Cloudflare DNS. In Cloudflare:
+
+1. Open Zero Trust → Networks → Tunnels and create a tunnel.
+2. Add a public hostname, for example `bjj.example.com`, with service
+   `http://app:5000`.
+3. Copy the tunnel token into `CLOUDFLARE_TUNNEL_TOKEN` in `.env`.
+4. Start the tunnel with `docker compose --profile public up -d`.
+
+The tunnel runs inside the Compose network, so the app does not need a public
+port or router port-forwarding. Tailscale is suitable when access can be
+limited to people/devices in your private tailnet.
+
 ## Overview
 uob-bjj-webapp is a flask webapp to replace the old sign-up system for the University of Birmingham Brazilian Jiu Jitsu taster sessions during the start of the 2024 academic year.
 
