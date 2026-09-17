@@ -3,6 +3,7 @@ import sqlite3
 from datetime import date, timedelta
 
 import psycopg
+from werkzeug.security import generate_password_hash
 
 import config
 
@@ -93,8 +94,41 @@ def _initialise_postgres_database(connection):
                 UNIQUE(email, event_id)
             );
         ''')
+        _bootstrap_initial_admin(cursor)
     connection.commit()
     _postgres_initialised = True
+
+
+def _bootstrap_initial_admin(cursor):
+    """Create/promote the first administrator from deployment secrets.
+
+    This is intentionally environment-driven because Render's free services
+    do not provide an interactive shell. Remove INITIAL_ADMIN_PASSWORD after
+    the first successful deployment.
+    """
+    if config.PERMANENT_ADMIN_EMAIL:
+        cursor.execute('''
+            UPDATE user_table
+            SET user_role = 'administrator'
+            WHERE LOWER(email) = %s
+        ''', (config.PERMANENT_ADMIN_EMAIL,))
+
+    email = os.getenv('INITIAL_ADMIN_EMAIL', '').strip()
+    password = os.getenv('INITIAL_ADMIN_PASSWORD', '')
+    if not email or not password:
+        return
+
+    first_name = os.getenv('INITIAL_ADMIN_FIRST_NAME', 'Admin').strip() or 'Admin'
+    last_name = os.getenv('INITIAL_ADMIN_LAST_NAME', 'User').strip() or 'User'
+    cursor.execute('''
+        INSERT INTO user_table (email, password, first_name, last_name, medical_info, user_role)
+        VALUES (%s, %s, %s, %s, %s, 'administrator')
+        ON CONFLICT (email) DO UPDATE SET user_role = 'administrator'
+    ''', (email, generate_password_hash(password), first_name, last_name, ''))
+
+
+def is_permanent_admin_email(email):
+    return bool(email) and email.strip().lower() == config.PERMANENT_ADMIN_EMAIL
 
 
 def _sql(sql):

@@ -16,6 +16,16 @@ services:
         value: "0"
       - key: FLASK_DEBUG
         value: "0"
+      - key: PERMANENT_ADMIN_EMAIL
+        value: txc282@student.bham.ac.uk
+      - key: INITIAL_ADMIN_EMAIL
+        sync: false
+      - key: INITIAL_ADMIN_PASSWORD
+        sync: false
+      - key: INITIAL_ADMIN_FIRST_NAME
+        sync: false
+      - key: INITIAL_ADMIN_LAST_NAME
+        sync: false
 
 databases:
   - name: uob-bjj-db

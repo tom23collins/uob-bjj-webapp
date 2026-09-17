@@ -1,6 +1,6 @@
 from flask import Flask, redirect, render_template, url_for, request, flash
 import flask_login
-from db import db_query, db_update, db_query_values
+from db import db_query, db_update, db_query_values, is_permanent_admin_email
 import config
 import os
 from datetime import datetime, timedelta
@@ -222,15 +222,16 @@ def register():
 
     # Prepare SQL query to insert new user
     sql = """
-    INSERT INTO user_table (email, password, first_name, last_name, medical_info)
-    VALUES (%s, %s, %s, %s, %s)
+    INSERT INTO user_table (email, password, first_name, last_name, medical_info, user_role)
+    VALUES (%s, %s, %s, %s, %s, %s)
     """
     values = (
         request.form['email'],
         generate_password_hash(request.form['password']),
         request.form['first_name'],
         request.form['last_name'],
-        request.form['medical_info']
+        request.form['medical_info'],
+        'administrator' if is_permanent_admin_email(request.form['email']) else 'user'
     )
 
     # Execute the database update function

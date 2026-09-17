@@ -7,6 +7,10 @@ load_dotenv()
 # Secret key
 SECRET_KEY = os.getenv('SECRET_KEY', 'local-demo-secret-key')
 
+# This account is kept as the club's permanent administrator. Override only
+# if the deployment is being reused for a different club.
+PERMANENT_ADMIN_EMAIL = os.getenv('PERMANENT_ADMIN_EMAIL', 'txc282@student.bham.ac.uk').strip().lower()
+
 # Use SQLite locally when PostgreSQL is not configured.
 DATABASE_URL = os.getenv('DATABASE_URL')
 PG_HOST = os.getenv('AZURE_POSTGRES_HOST', os.getenv('PGHOST'))

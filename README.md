@@ -41,6 +41,28 @@ string automatically.
 4. After the first deploy, add your existing domain under the web service's
    **Settings → Custom Domains** and follow Render's DNS instructions.
 
+The account `txc282@student.bham.ac.uk` is configured as the permanent
+administrator. Register that email through the normal registration page, then
+log in and use **Create event**. Existing accounts with that email are
+promoted during the next app startup.
+
+If you ever need to create a different first administrator on Render's Free
+plan, add these environment
+variables under the service's **Environment** settings before restarting or
+redeploying:
+
+```text
+INITIAL_ADMIN_EMAIL=your@email.com
+INITIAL_ADMIN_PASSWORD=<a-long-unique-password>
+INITIAL_ADMIN_FIRST_NAME=Your first name
+INITIAL_ADMIN_LAST_NAME=Your last name
+```
+
+The app creates or promotes that account to `administrator` during startup.
+Log in through the normal `/login` page, confirm that you can see **Create
+event**, then remove `INITIAL_ADMIN_PASSWORD` from Render and redeploy. The
+administrator role remains in the database.
+
 The free web service can sleep after inactivity, so its first request after a
 quiet period may be slow. The free PostgreSQL database is limited to 1 GB,
 has no backups, and expires after 30 days; export the data before the expiry
